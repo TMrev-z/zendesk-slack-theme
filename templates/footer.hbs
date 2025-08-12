@@ -1,0 +1,258 @@
+<footer class="footer">
+  <div class="footer-container">
+    <div class="footer-content">
+      <div class="footer-sections">
+        <!-- Help Center Links -->
+        <div class="footer-section">
+          <h3 class="footer-section-title">ヘルプセンター</h3>
+          <ul class="footer-links">
+            <li><a href="{{help_center.url}}" class="footer-link">ホーム</a></li>
+            <li><a href="{{help_center.url}}/hc/{{locale}}/search" class="footer-link">記事を検索</a></li>
+            {{#each categories}}
+            <li><a href="{{url}}" class="footer-link">{{name}}</a></li>
+            {{/each}}
+          </ul>
+        </div>
+
+        <!-- Community Links -->
+        {{#if community}}
+        <div class="footer-section">
+          <h3 class="footer-section-title">コミュニティ</h3>
+          <ul class="footer-links">
+            <li><a href="{{community.url}}" class="footer-link">コミュニティトップ</a></li>
+            <li><a href="{{community.url}}/topics" class="footer-link">トピック一覧</a></li>
+            <li><a href="{{community.url}}/posts" class="footer-link">最新の投稿</a></li>
+            {{#if current_user}}
+            <li><a href="{{community.url}}/posts/new" class="footer-link">質問を投稿</a></li>
+            {{/if}}
+          </ul>
+        </div>
+        {{/if}}
+
+        <!-- Support Links -->
+        <div class="footer-section">
+          <h3 class="footer-section-title">サポート</h3>
+          <ul class="footer-links">
+            <li><a href="{{help_center.url}}/requests/new" class="footer-link">お問い合わせ</a></li>
+            {{#if current_user}}
+            <li><a href="{{help_center.url}}/requests" class="footer-link">リクエスト履歴</a></li>
+            {{/if}}
+            {{#if help_center.phone}}
+            <li><a href="tel:{{help_center.phone}}" class="footer-link">電話サポート</a></li>
+            {{/if}}
+            {{#if status_page_url}}
+            <li><a href="{{status_page_url}}" target="_blank" class="footer-link">サービスステータス</a></li>
+            {{/if}}
+          </ul>
+        </div>
+
+        <!-- Account Links -->
+        <div class="footer-section">
+          <h3 class="footer-section-title">アカウント</h3>
+          <ul class="footer-links">
+            {{#if current_user}}
+            <li><a href="{{current_user.profile_url}}" class="footer-link">プロフィール</a></li>
+            <li><a href="{{current_user.contributions_url}}" class="footer-link">貢献履歴</a></li>
+            <li><a href="{{help_center.url}}/settings" class="footer-link">設定</a></li>
+            <li><a href="{{help_center.signout_url}}" class="footer-link">サインアウト</a></li>
+            {{else}}
+            <li><a href="{{help_center.signin_url}}" class="footer-link">サインイン</a></li>
+            <li><a href="{{help_center.signup_url}}" class="footer-link">アカウント作成</a></li>
+            {{/if}}
+          </ul>
+        </div>
+
+        <!-- Company/Organization Links -->
+        <div class="footer-section">
+          <h3 class="footer-section-title">会社情報</h3>
+          <ul class="footer-links">
+            {{#if help_center.company_website}}
+            <li><a href="{{help_center.company_website}}" target="_blank" class="footer-link">公式サイト</a></li>
+            {{/if}}
+            <li><a href="/privacy" class="footer-link">プライバシーポリシー</a></li>
+            <li><a href="/terms" class="footer-link">利用規約</a></li>
+            <li><a href="/about" class="footer-link">会社概要</a></li>
+            {{#if help_center.blog_url}}
+            <li><a href="{{help_center.blog_url}}" target="_blank" class="footer-link">ブログ</a></li>
+            {{/if}}
+          </ul>
+        </div>
+      </div>
+
+      <!-- Footer Bottom -->
+      <div class="footer-bottom">
+        <div class="footer-branding">
+          <div class="footer-logo">
+            {{#if help_center.logo}}
+            <img src="{{help_center.logo}}" alt="{{help_center.name}}" class="footer-logo-img" loading="lazy">
+            {{/if}}
+            <span class="footer-brand-name">{{help_center.name}}</span>
+          </div>
+          
+          {{#if help_center.description}}
+          <p class="footer-description">{{help_center.description}}</p>
+          {{/if}}
+        </div>
+
+        <div class="footer-social">
+          {{#if social_links}}
+          <h4 class="footer-social-title">フォローする</h4>
+          <div class="footer-social-links">
+            {{#each social_links}}
+            <a href="{{url}}" target="_blank" rel="noopener noreferrer" class="footer-social-link" title="{{name}}">
+              {{#is name 'Twitter'}}🐦{{/is}}
+              {{#is name 'Facebook'}}📘{{/is}}
+              {{#is name 'LinkedIn'}}💼{{/is}}
+              {{#is name 'YouTube'}}📺{{/is}}
+              {{#is name 'Instagram'}}📷{{/is}}
+              {{#is name 'GitHub'}}🐙{{/is}}
+              <span class="social-name">{{name}}</span>
+            </a>
+            {{/each}}
+          </div>
+          {{/if}}
+        </div>
+      </div>
+
+      <!-- Footer Meta -->
+      <div class="footer-meta">
+        <div class="footer-copyright">
+          <p>&copy; {{current_year}} {{help_center.name}}. All rights reserved.</p>
+          {{#if help_center.address}}
+          <p class="footer-address">{{help_center.address}}</p>
+          {{/if}}
+        </div>
+
+        <div class="footer-utility">
+          <!-- Language Selector -->
+          {{#if multiple_locales}}
+          <div class="footer-locale">
+            <label for="footer-locale-select" class="footer-locale-label">言語:</label>
+            <select id="footer-locale-select" class="footer-locale-select" onchange="window.location.href=this.value">
+              {{#each locales}}
+              <option value="{{url}}" {{#if current}}selected{{/if}}>{{name}}</option>
+              {{/each}}
+            </select>
+          </div>
+          {{/if}}
+
+          <!-- Theme Toggle -->
+          <div class="footer-theme">
+            <button class="footer-theme-toggle" id="theme-toggle" title="テーマを切り替え">
+              <span class="theme-icon theme-icon-light">☀️</span>
+              <span class="theme-icon theme-icon-dark">🌙</span>
+            </button>
+          </div>
+
+          <!-- Back to Top -->
+          <div class="footer-scroll">
+            <button class="footer-scroll-top" id="scroll-to-top" title="ページトップに戻る">
+              <span class="scroll-icon">⬆️</span>
+              <span class="scroll-text">トップに戻る</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Accessibility Statement -->
+      <div class="footer-accessibility">
+        <p class="accessibility-text">
+          このサイトはアクセシビリティに配慮して設計されています。
+          <a href="/accessibility" class="accessibility-link">アクセシビリティについて</a>
+        </p>
+      </div>
+
+      <!-- Powered By -->
+      <div class="footer-powered">
+        <p class="powered-text">
+          Powered by <a href="https://www.zendesk.com" target="_blank" rel="noopener noreferrer" class="powered-link">Zendesk</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Footer Scripts -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Scroll to top functionality
+  const scrollToTopBtn = document.getElementById('scroll-to-top');
+  if (scrollToTopBtn) {
+    // Show/hide scroll to top button
+    window.addEventListener('scroll', function() {
+      if (window.pageYOffset > 300) {
+        scrollToTopBtn.classList.add('visible');
+      } else {
+        scrollToTopBtn.classList.remove('visible');
+      }
+    });
+
+    // Scroll to top on click
+    scrollToTopBtn.addEventListener('click', function() {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    });
+  }
+
+  // Theme toggle functionality
+  const themeToggle = document.getElementById('theme-toggle');
+  if (themeToggle) {
+    // Check for saved theme or default to light
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', currentTheme);
+    
+    // Update button state
+    updateThemeButton(currentTheme);
+
+    themeToggle.addEventListener('click', function() {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      updateThemeButton(newTheme);
+    });
+
+    function updateThemeButton(theme) {
+      const lightIcon = themeToggle.querySelector('.theme-icon-light');
+      const darkIcon = themeToggle.querySelector('.theme-icon-dark');
+      
+      if (theme === 'dark') {
+        lightIcon.style.display = 'inline';
+        darkIcon.style.display = 'none';
+      } else {
+        lightIcon.style.display = 'none';
+        darkIcon.style.display = 'inline';
+      }
+    }
+  }
+
+  // Footer link tracking
+  const footerLinks = document.querySelectorAll('.footer-link');
+  footerLinks.forEach(link => {
+    link.addEventListener('click', function() {
+      // Analytics tracking could go here
+      if (typeof gtag !== 'undefined') {
+        gtag('event', 'click', {
+          'event_category': 'footer',
+          'event_label': this.textContent,
+          'value': this.href
+        });
+      }
+    });
+  });
+
+  // Service worker registration for offline support
+  if ('serviceWorker' in navigator && '{{help_center.offline_support}}' === 'true') {
+    navigator.serviceWorker.register('/sw.js')
+      .then(function(registration) {
+        console.log('ServiceWorker registration successful');
+      })
+      .catch(function(err) {
+        console.log('ServiceWorker registration failed: ', err);
+      });
+  }
+});
+</script>
