@@ -1,0 +1,21 @@
+{
+  "name": "Slack-like Theme",
+  "author": "Custom Development",
+  "version": "1.0.0",
+  "api_version": 2,
+  "default_locale": "ja",
+  "settings": [
+    {
+      "label": "Brand Color",
+      "variables": [
+        {
+          "identifier": "brand_color",
+          "type": "color",
+          "description": "Main brand color",
+          "label": "Brand Color",
+          "value": "#007a5a"
+        }
+      ]
+    }
+  ]
+}

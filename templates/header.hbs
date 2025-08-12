@@ -1,0 +1,43 @@
+<header class="header">
+  <nav class="header-nav">
+    <div class="header-nav__inner">
+      <div class="header-nav__brand">
+        <a href="{{help_center.url}}" class="header-nav__logo">
+          {{#if help_center.logo_url}}
+            <img src="{{help_center.logo_url}}" alt="{{help_center.name}}" class="header-nav__logo-img">
+          {{else}}
+            <span class="header-nav__logo-text">{{help_center.name}}</span>
+          {{/if}}
+        </a>
+      </div>
+      
+      <div class="header-nav__menu">
+        <ul class="header-nav__list">
+          <li class="header-nav__item">
+            <a href="{{help_center.url}}" class="header-nav__link {{#is page.type 'home'}}header-nav__link--active{{/is}}">
+              ホーム
+            </a>
+          </li>
+          {{#each categories}}
+          <li class="header-nav__item">
+            <a href="{{url}}" class="header-nav__link">
+              {{name}}
+            </a>
+          </li>
+          {{/each}}
+        </ul>
+      </div>
+      
+      <div class="header-nav__actions">
+        {{#if current_user}}
+          <div class="header-nav__user">
+            <span class="header-nav__user-name">{{current_user.name}}</span>
+            <a href="{{current_user.logout_url}}" class="header-nav__logout">ログアウト</a>
+          </div>
+        {{else}}
+          <a href="{{help_center.signin_url}}" class="header-nav__signin">サインイン</a>
+        {{/if}}
+      </div>
+    </div>
+  </nav>
+</header>

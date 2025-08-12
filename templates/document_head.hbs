@@ -1,0 +1,29 @@
+<meta charset="utf-8">
+<title>{{#if page.title}}{{page.title}} – {{/if}}{{help_center.name}}</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<meta name="description" content="{{#if page.description}}{{page.description}}{{else}}{{help_center.description}}{{/if}}">
+
+{{#if page.canonical_url}}
+<link rel="canonical" href="{{page.canonical_url}}">
+{{/if}}
+
+<link rel="stylesheet" href="{{asset 'stylesheets/style.css'}}">
+<script src="{{asset 'scripts/script.js'}}" defer></script>
+
+<!-- Slack-like theme meta -->
+<meta name="theme-color" content="#007a5a">
+<meta name="author" content="{{help_center.name}}">
+<meta property="og:type" content="website">
+<meta property="og:title" content="{{#if page.title}}{{page.title}}{{else}}{{help_center.name}}{{/if}}">
+<meta property="og:description" content="{{#if page.description}}{{page.description}}{{else}}{{help_center.description}}{{/if}}">
+{{#if page.canonical_url}}
+<meta property="og:url" content="{{page.canonical_url}}">
+{{/if}}
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="{{#if page.title}}{{page.title}}{{else}}{{help_center.name}}{{/if}}">
+<meta name="twitter:description" content="{{#if page.description}}{{page.description}}{{else}}{{help_center.description}}{{/if}}">
+
+<!-- Favicon -->
+<link rel="icon" type="image/x-icon" href="{{help_center.favicon_url}}">

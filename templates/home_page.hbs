@@ -1,0 +1,39 @@
+<section class="hc-hero">
+  <div class="hc-hero__inner">
+    <h1 class="hc-hero__title">お手伝いします</h1>
+    <p class="hc-hero__sub">キーワードで検索して、最短で解決にたどり着きましょう</p>
+    <div class="hc-hero__search">
+      {{search instant=true placeholder="例：請求書 / 管理者設定 / 連携"}}
+    </div>
+    <ul class="hc-quicklinks">
+      <li><a href="/hc/{{locale}}/sections/4897767719454">FAQ</a></li>
+      <li><a href="/hc/{{locale}}/sections/4897767717918">お知らせ</a></li>
+      <li><a href="/hc/{{locale}}/categories/4897783095966">一般情報</a></li>
+    </ul>
+  </div>
+</section>
+
+<section class="hc-cats">
+  <div class="hc-container">
+    <ul class="hc-cats__grid">
+      {{#each categories}}
+        <li class="hc-card" data-category-id="{{id}}">
+          <a class="hc-card__link" href="{{url}}">
+            <div class="hc-card__icon">
+              <img src="{{asset 'icons/default.svg'}}" alt="" loading="lazy" />
+            </div>
+            <h3 class="hc-card__title">{{name}}</h3>
+            {{#if description}}<p class="hc-card__desc">{{description}}</p>{{/if}}
+          </a>
+        </li>
+      {{/each}}
+    </ul>
+  </div>
+</section>
+
+<section class="hc-featured">
+  <div class="hc-container">
+    <h2>おすすめ記事</h2>
+    <ul id="js-featured-list" class="hc-featured__list"></ul>
+  </div>
+</section>
