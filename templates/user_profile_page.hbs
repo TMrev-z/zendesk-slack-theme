@@ -1,0 +1,512 @@
+{{#with user}}
+<div class="user-profile-container">
+  <nav class="profile-breadcrumbs">
+    <ol class="breadcrumbs">
+      <li class="breadcrumbs-item">
+        <a href="{{help_center.url}}">{{help_center.name}}</a>
+      </li>
+      {{#if community.url}}
+      <li class="breadcrumbs-item">
+        <a href="{{community.url}}">コミュニティ</a>
+      </li>
+      {{/if}}
+    </ol>
+  </nav>
+
+  <header class="profile-header">
+    <div class="profile-header-main">
+      <div class="profile-avatar-section">
+        {{#if avatar_url}}
+        <img src="{{avatar_url}}" alt="{{name}}" class="profile-avatar" loading="lazy">
+        {{else}}
+        <div class="profile-avatar-placeholder">
+          <span class="avatar-initials">{{initials name}}</span>
+        </div>
+        {{/if}}
+        
+        {{#if is_online}}
+        <div class="profile-online-indicator">
+          <span class="online-dot"></span>
+        </div>
+        {{/if}}
+      </div>
+
+      <div class="profile-info">
+        <h1 class="profile-name">{{name}}</h1>
+        
+        {{#if title}}
+        <div class="profile-title">{{title}}</div>
+        {{/if}}
+        
+        {{#if organization}}
+        <div class="profile-organization">
+          <span class="organization-icon">🏢</span>
+          <span class="organization-name">{{organization.name}}</span>
+        </div>
+        {{/if}}
+        
+        <div class="profile-meta">
+          {{#if location}}
+          <div class="profile-location">
+            <span class="location-icon">📍</span>
+            <span class="location-text">{{location}}</span>
+          </div>
+          {{/if}}
+          
+          <div class="profile-joined">
+            <span class="joined-icon">📅</span>
+            <span class="joined-text">{{date created_at}}に参加</span>
+          </div>
+          
+          {{#if last_sign_in_at}}
+          <div class="profile-last-seen">
+            <span class="last-seen-icon">⏰</span>
+            <span class="last-seen-text">最終ログイン: {{date last_sign_in_at timeago=true}}</span>
+          </div>
+          {{/if}}
+        </div>
+        
+        {{#if bio}}
+        <div class="profile-bio">
+          <p>{{bio}}</p>
+        </div>
+        {{/if}}
+      </div>
+    </div>
+
+    <div class="profile-actions">
+      {{#if current_user}}
+        {{#is current_user.id id}}
+          <!-- Own profile -->
+          <a href="{{edit_profile_url}}" class="btn btn-primary profile-edit">
+            プロフィールを編集
+          </a>
+        {{else}}
+          <!-- Other user's profile -->
+          {{#if can_message}}
+          <button class="btn btn-primary profile-message" data-user-id="{{id}}">
+            メッセージを送る
+          </button>
+          {{/if}}
+          
+          {{#if can_follow}}
+          <button class="btn btn-secondary profile-follow {{#if is_following}}profile-follow--active{{/if}}" 
+                  data-user-id="{{id}}">
+            {{#if is_following}}
+              <span class="follow-icon">✓</span>
+              <span class="follow-text">フォロー中</span>
+            {{else}}
+              <span class="follow-icon">+</span>
+              <span class="follow-text">フォロー</span>
+            {{/if}}
+          </button>
+          {{/if}}
+        {{/is}}
+      {{else}}
+        <a href="{{help_center.signin_url}}" class="btn btn-secondary profile-signin">
+          サインインして交流する
+        </a>
+      {{/if}}
+    </div>
+  </header>
+
+  <main class="profile-main">
+    <div class="profile-stats">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-number">{{posts_count}}</div>
+          <div class="stat-label">投稿</div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-number">{{comments_count}}</div>
+          <div class="stat-label">コメント</div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-number">{{votes_received}}</div>
+          <div class="stat-label">受け取った投票</div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-number">{{solutions_count}}</div>
+          <div class="stat-label">解決した質問</div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-number">{{followers_count}}</div>
+          <div class="stat-label">フォロワー</div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-number">{{following_count}}</div>
+          <div class="stat-label">フォロー中</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="profile-content">
+      <div class="profile-tabs">
+        <nav class="tabs-nav">
+          <button class="tab-btn tab-btn--active" data-tab="activity">最近の活動</button>
+          <button class="tab-btn" data-tab="posts">投稿</button>
+          <button class="tab-btn" data-tab="comments">コメント</button>
+          <button class="tab-btn" data-tab="solutions">解決策</button>
+          {{#if badges}}
+          <button class="tab-btn" data-tab="badges">バッジ</button>
+          {{/if}}
+        </nav>
+      </div>
+
+      <!-- Activity Tab -->
+      <div class="tab-content tab-content--active" id="activity-tab">
+        {{#if recent_activity}}
+        <div class="activity-timeline">
+          <h3>最近の活動</h3>
+          <ul class="timeline-list">
+            {{#each recent_activity}}
+            <li class="timeline-item">
+              <div class="timeline-marker">
+                <div class="timeline-icon timeline-icon--{{type}}">
+                  {{#is type 'post'}}📝{{/is}}
+                  {{#is type 'comment'}}💬{{/is}}
+                  {{#is type 'vote'}}👍{{/is}}
+                  {{#is type 'solution'}}✅{{/is}}
+                  {{#is type 'follow'}}👥{{/is}}
+                </div>
+              </div>
+              
+              <div class="timeline-content">
+                <div class="timeline-action">
+                  {{#is type 'post'}}
+                    <a href="{{object.url}}" class="timeline-link">新しい投稿を作成しました</a>
+                    <div class="timeline-title">「{{object.title}}」</div>
+                  {{/is}}
+                  
+                  {{#is type 'comment'}}
+                    <a href="{{object.post.url}}#comment-{{object.id}}" class="timeline-link">コメントしました</a>
+                    <div class="timeline-title">「{{object.post.title}}」</div>
+                  {{/is}}
+                  
+                  {{#is type 'vote'}}
+                    <span class="timeline-text">投票しました</span>
+                    <div class="timeline-title">「{{object.title}}」</div>
+                  {{/is}}
+                  
+                  {{#is type 'solution'}}
+                    <a href="{{object.url}}" class="timeline-link">問題を解決しました</a>
+                    <div class="timeline-title">「{{object.title}}」</div>
+                  {{/is}}
+                  
+                  {{#is type 'follow'}}
+                    <span class="timeline-text">{{object.name}}さんをフォローしました</span>
+                  {{/is}}
+                </div>
+                
+                <time class="timeline-date" datetime="{{created_at}}">
+                  {{date created_at timeago=true}}
+                </time>
+              </div>
+            </li>
+            {{/each}}
+          </ul>
+        </div>
+        {{else}}
+        <div class="activity-empty">
+          <div class="empty-state">
+            <div class="empty-state-icon">📊</div>
+            <h3 class="empty-state-title">まだ活動がありません</h3>
+            <p class="empty-state-description">コミュニティに参加して活動を始めましょう。</p>
+          </div>
+        </div>
+        {{/if}}
+      </div>
+
+      <!-- Posts Tab -->
+      <div class="tab-content" id="posts-tab">
+        {{#if posts}}
+        <div class="profile-posts">
+          <h3>投稿 ({{posts.length}})</h3>
+          <ul class="posts-list">
+            {{#each posts}}
+            <li class="post-item">
+              <article class="profile-post">
+                <h4 class="post-title">
+                  <a href="{{url}}" class="post-link">{{title}}</a>
+                </h4>
+                
+                {{#if topic}}
+                <div class="post-topic">
+                  <a href="{{topic.url}}" class="topic-tag">{{topic.name}}</a>
+                </div>
+                {{/if}}
+                
+                <div class="post-stats">
+                  <span class="post-votes">{{vote_sum}} 投票</span>
+                  <span class="post-comments">{{comment_count}} コメント</span>
+                  <time class="post-date" datetime="{{created_at}}">
+                    {{date created_at timeago=true}}
+                  </time>
+                </div>
+                
+                {{#if status}}
+                <div class="post-status post-status--{{status}}">
+                  {{#is status 'solved'}}
+                    <span class="status-icon">✅</span>
+                    <span class="status-text">解決済み</span>
+                  {{/is}}
+                  {{#is status 'answered'}}
+                    <span class="status-icon">💬</span>
+                    <span class="status-text">回答済み</span>
+                  {{/is}}
+                </div>
+                {{/if}}
+              </article>
+            </li>
+            {{/each}}
+          </ul>
+        </div>
+        {{else}}
+        <div class="posts-empty">
+          <div class="empty-state">
+            <div class="empty-state-icon">📝</div>
+            <h3 class="empty-state-title">投稿がありません</h3>
+            <p class="empty-state-description">まだ投稿を作成していません。</p>
+          </div>
+        </div>
+        {{/if}}
+      </div>
+
+      <!-- Comments Tab -->
+      <div class="tab-content" id="comments-tab">
+        {{#if comments}}
+        <div class="profile-comments">
+          <h3>コメント ({{comments.length}})</h3>
+          <ul class="comments-list">
+            {{#each comments}}
+            <li class="comment-item">
+              <article class="profile-comment">
+                <div class="comment-content">
+                  <div class="comment-body">{{excerpt body characters=200}}</div>
+                  <div class="comment-post-info">
+                    <span class="comment-label">投稿:</span>
+                    <a href="{{post.url}}" class="comment-post-link">{{post.title}}</a>
+                  </div>
+                </div>
+                
+                <div class="comment-meta">
+                  <span class="comment-votes">{{vote_sum}} 投票</span>
+                  <time class="comment-date" datetime="{{created_at}}">
+                    {{date created_at timeago=true}}
+                  </time>
+                </div>
+              </article>
+            </li>
+            {{/each}}
+          </ul>
+        </div>
+        {{else}}
+        <div class="comments-empty">
+          <div class="empty-state">
+            <div class="empty-state-icon">💬</div>
+            <h3 class="empty-state-title">コメントがありません</h3>
+            <p class="empty-state-description">まだコメントを投稿していません。</p>
+          </div>
+        </div>
+        {{/if}}
+      </div>
+
+      <!-- Solutions Tab -->
+      <div class="tab-content" id="solutions-tab">
+        {{#if solutions}}
+        <div class="profile-solutions">
+          <h3>解決した問題 ({{solutions.length}})</h3>
+          <ul class="solutions-list">
+            {{#each solutions}}
+            <li class="solution-item">
+              <article class="profile-solution">
+                <div class="solution-badge">
+                  <span class="solution-icon">✅</span>
+                </div>
+                
+                <div class="solution-content">
+                  <h4 class="solution-title">
+                    <a href="{{post.url}}" class="solution-link">{{post.title}}</a>
+                  </h4>
+                  
+                  <div class="solution-excerpt">{{excerpt solution_text characters=150}}</div>
+                  
+                  <div class="solution-meta">
+                    <time class="solution-date" datetime="{{solved_at}}">
+                      {{date solved_at timeago=true}}に解決
+                    </time>
+                    {{#if topic}}
+                    <a href="{{topic.url}}" class="solution-topic">{{topic.name}}</a>
+                    {{/if}}
+                  </div>
+                </div>
+              </article>
+            </li>
+            {{/each}}
+          </ul>
+        </div>
+        {{else}}
+        <div class="solutions-empty">
+          <div class="empty-state">
+            <div class="empty-state-icon">🎯</div>
+            <h3 class="empty-state-title">解決した問題がありません</h3>
+            <p class="empty-state-description">まだ問題を解決していません。</p>
+          </div>
+        </div>
+        {{/if}}
+      </div>
+
+      <!-- Badges Tab -->
+      {{#if badges}}
+      <div class="tab-content" id="badges-tab">
+        <div class="profile-badges">
+          <h3>獲得バッジ ({{badges.length}})</h3>
+          <div class="badges-grid">
+            {{#each badges}}
+            <div class="badge-card">
+              <div class="badge-icon-large">{{icon}}</div>
+              <div class="badge-info">
+                <div class="badge-name">{{name}}</div>
+                <div class="badge-description">{{description}}</div>
+                {{#if earned_at}}
+                <div class="badge-earned">
+                  {{date earned_at}}に獲得
+                </div>
+                {{/if}}
+              </div>
+            </div>
+            {{/each}}
+          </div>
+        </div>
+      </div>
+      {{/if}}
+    </div>
+
+    <!-- Pagination -->
+    {{pagination}}
+  </main>
+
+  <aside class="profile-sidebar">
+    {{#if contact_info}}
+    <div class="profile-contact">
+      <h3>連絡先</h3>
+      <div class="contact-info">
+        {{#if contact_info.email}}
+        <div class="contact-item">
+          <span class="contact-icon">📧</span>
+          <a href="mailto:{{contact_info.email}}" class="contact-link">{{contact_info.email}}</a>
+        </div>
+        {{/if}}
+        
+        {{#if contact_info.website}}
+        <div class="contact-item">
+          <span class="contact-icon">🌐</span>
+          <a href="{{contact_info.website}}" target="_blank" class="contact-link">ウェブサイト</a>
+        </div>
+        {{/if}}
+        
+        {{#if contact_info.twitter}}
+        <div class="contact-item">
+          <span class="contact-icon">🐦</span>
+          <a href="https://twitter.com/{{contact_info.twitter}}" target="_blank" class="contact-link">@{{contact_info.twitter}}</a>
+        </div>
+        {{/if}}
+      </div>
+    </div>
+    {{/if}}
+
+    {{#if skills}}
+    <div class="profile-skills">
+      <h3>スキル・専門分野</h3>
+      <div class="skills-list">
+        {{#each skills}}
+        <span class="skill-tag">{{name}}</span>
+        {{/each}}
+      </div>
+    </div>
+    {{/if}}
+
+    {{#if following}}
+    <div class="profile-following">
+      <h3>フォロー中 ({{following.length}})</h3>
+      <ul class="following-list">
+        {{#each following}}
+        <li class="following-item">
+          <a href="{{profile_url}}" class="following-link">
+            {{#if avatar_url}}
+            <img src="{{avatar_url}}" alt="{{name}}" class="following-avatar" loading="lazy">
+            {{/if}}
+            <span class="following-name">{{name}}</span>
+          </a>
+        </li>
+        {{/each}}
+      </ul>
+    </div>
+    {{/if}}
+
+    <div class="profile-actions-sidebar">
+      <a href="{{contributions_url}}" class="btn btn-secondary profile-contributions">
+        貢献履歴を見る
+      </a>
+      
+      {{#if current_user}}
+        {{#unless is_current_user}}
+        <button class="btn btn-secondary profile-report" data-user-id="{{id}}">
+          ユーザーを報告
+        </button>
+        {{/unless}}
+      {{/if}}
+    </div>
+  </aside>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Tab switching
+  const tabButtons = document.querySelectorAll('.tab-btn');
+  const tabContents = document.querySelectorAll('.tab-content');
+  
+  tabButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const targetTab = this.dataset.tab;
+      
+      // Remove active class from all tabs and contents
+      tabButtons.forEach(btn => btn.classList.remove('tab-btn--active'));
+      tabContents.forEach(content => content.classList.remove('tab-content--active'));
+      
+      // Add active class to clicked tab and corresponding content
+      this.classList.add('tab-btn--active');
+      document.getElementById(targetTab + '-tab').classList.add('tab-content--active');
+    });
+  });
+  
+  // Follow/Unfollow functionality
+  const followBtn = document.querySelector('.profile-follow');
+  if (followBtn) {
+    followBtn.addEventListener('click', function() {
+      const userId = this.dataset.userId;
+      const isFollowing = this.classList.contains('profile-follow--active');
+      
+      // Toggle UI immediately
+      if (isFollowing) {
+        this.classList.remove('profile-follow--active');
+        this.querySelector('.follow-icon').textContent = '+';
+        this.querySelector('.follow-text').textContent = 'フォロー';
+      } else {
+        this.classList.add('profile-follow--active');
+        this.querySelector('.follow-icon').textContent = '✓';
+        this.querySelector('.follow-text').textContent = 'フォロー中';
+      }
+      
+      // API call would go here
+      console.log(isFollowing ? 'Unfollowing' : 'Following', 'user', userId);
+    });
+  }
+});
+</script>
+{{/with}}

@@ -1,0 +1,526 @@
+<div class="request-page-container">
+  <nav class="request-breadcrumbs">
+    <ol class="breadcrumbs">
+      <li class="breadcrumbs-item">
+        <a href="{{help_center.url}}">{{help_center.name}}</a>
+      </li>
+      <li class="breadcrumbs-item">
+        <a href="{{help_center.url}}/requests">サポートリクエスト</a>
+      </li>
+    </ol>
+  </nav>
+
+  <header class="request-header">
+    <h1 class="request-title">
+      {{#if request}}
+        リクエスト #{{request.id}}
+      {{else}}
+        新しいリクエストを送信
+      {{/if}}
+    </h1>
+    
+    {{#if request}}
+    <div class="request-status-bar">
+      <div class="request-status request-status--{{request.status}}">
+        <span class="status-icon">
+          {{#is request.status 'new'}}🆕{{/is}}
+          {{#is request.status 'open'}}📖{{/is}}
+          {{#is request.status 'pending'}}⏳{{/is}}
+          {{#is request.status 'solved'}}✅{{/is}}
+          {{#is request.status 'closed'}}📁{{/is}}
+        </span>
+        <span class="status-text">
+          {{#is request.status 'new'}}新規{{/is}}
+          {{#is request.status 'open'}}対応中{{/is}}
+          {{#is request.status 'pending'}}保留中{{/is}}
+          {{#is request.status 'solved'}}解決済み{{/is}}
+          {{#is request.status 'closed'}}完了{{/is}}
+        </span>
+      </div>
+      
+      {{#if request.priority}}
+      <div class="request-priority request-priority--{{request.priority}}">
+        <span class="priority-icon">
+          {{#is request.priority 'urgent'}}🔴{{/is}}
+          {{#is request.priority 'high'}}🟠{{/is}}
+          {{#is request.priority 'normal'}}🟡{{/is}}
+          {{#is request.priority 'low'}}🟢{{/is}}
+        </span>
+        <span class="priority-text">
+          {{#is request.priority 'urgent'}}緊急{{/is}}
+          {{#is request.priority 'high'}}高{{/is}}
+          {{#is request.priority 'normal'}}通常{{/is}}
+          {{#is request.priority 'low'}}低{{/is}}
+        </span>
+      </div>
+      {{/if}}
+    </div>
+    {{/if}}
+  </header>
+
+  <main class="request-main">
+    {{#if request}}
+    <!-- Existing Request View -->
+    <div class="request-details">
+      <div class="request-info">
+        <h2 class="request-subject">{{request.subject}}</h2>
+        
+        <div class="request-meta">
+          <div class="request-meta-item">
+            <span class="meta-label">作成日:</span>
+            <time class="meta-value" datetime="{{request.created_at}}">
+              {{date request.created_at}}
+            </time>
+          </div>
+          
+          {{#if request.updated_at}}
+          <div class="request-meta-item">
+            <span class="meta-label">最終更新:</span>
+            <time class="meta-value" datetime="{{request.updated_at}}">
+              {{date request.updated_at timeago=true}}
+            </time>
+          </div>
+          {{/if}}
+          
+          {{#if request.assignee}}
+          <div class="request-meta-item">
+            <span class="meta-label">担当者:</span>
+            <div class="assignee-info">
+              {{#if request.assignee.avatar_url}}
+              <img src="{{request.assignee.avatar_url}}" alt="{{request.assignee.name}}" class="assignee-avatar" loading="lazy">
+              {{/if}}
+              <span class="assignee-name">{{request.assignee.name}}</span>
+            </div>
+          </div>
+          {{/if}}
+          
+          {{#if request.organization}}
+          <div class="request-meta-item">
+            <span class="meta-label">組織:</span>
+            <span class="meta-value">{{request.organization.name}}</span>
+          </div>
+          {{/if}}
+        </div>
+        
+        {{#if request.custom_fields}}
+        <div class="request-custom-fields">
+          <h3>追加情報</h3>
+          <dl class="custom-fields-list">
+            {{#each request.custom_fields}}
+            <dt class="field-label">{{title}}:</dt>
+            <dd class="field-value">{{value}}</dd>
+            {{/each}}
+          </dl>
+        </div>
+        {{/if}}
+      </div>
+
+      <!-- Conversation -->
+      <div class="request-conversation">
+        <h3>会話履歴</h3>
+        
+        {{#if request.comments}}
+        <ul class="conversation-list">
+          {{#each request.comments}}
+          <li class="conversation-item">
+            <article class="conversation-comment">
+              <div class="comment-header">
+                <div class="comment-author">
+                  {{#if author.avatar_url}}
+                  <img src="{{author.avatar_url}}" alt="{{author.name}}" class="comment-avatar" loading="lazy">
+                  {{/if}}
+                  <div class="author-info">
+                    <span class="author-name">{{author.name}}</span>
+                    {{#if author.agent}}
+                    <span class="author-badge">サポート</span>
+                    {{/if}}
+                  </div>
+                </div>
+                
+                <time class="comment-date" datetime="{{created_at}}">
+                  {{date created_at}}
+                </time>
+              </div>
+              
+              <div class="comment-body">
+                {{{body}}}
+              </div>
+              
+              {{#if attachments}}
+              <div class="comment-attachments">
+                <h4>添付ファイル</h4>
+                <ul class="attachments-list">
+                  {{#each attachments}}
+                  <li class="attachment-item">
+                    <a href="{{url}}" class="attachment-link" target="_blank">
+                      <span class="attachment-icon">📎</span>
+                      <span class="attachment-name">{{filename}}</span>
+                      {{#if size}}
+                      <span class="attachment-size">({{size}})</span>
+                      {{/if}}
+                    </a>
+                  </li>
+                  {{/each}}
+                </ul>
+              </div>
+              {{/if}}
+            </article>
+          </li>
+          {{/each}}
+        </ul>
+        {{else}}
+        <div class="conversation-empty">
+          <p>まだコメントがありません。</p>
+        </div>
+        {{/if}}
+
+        <!-- Reply Form -->
+        {{#unless request.solved}}
+        {{#unless request.closed}}
+        <div class="reply-form-section">
+          <h3>返信する</h3>
+          <form class="reply-form" method="post" action="{{request.url}}/comments" enctype="multipart/form-data">
+            <div class="form-group">
+              <label for="comment-body" class="form-label">メッセージ</label>
+              <textarea id="comment-body" name="comment[body]" class="form-textarea" 
+                        placeholder="返信内容を入力してください..." required rows="6"></textarea>
+            </div>
+            
+            <div class="form-group">
+              <label for="comment-attachments" class="form-label">添付ファイル</label>
+              <div class="file-upload-area">
+                <input type="file" id="comment-attachments" name="comment[attachments][]" 
+                       class="file-input" multiple accept="image/*,.pdf,.doc,.docx,.txt">
+                <label for="comment-attachments" class="file-upload-label">
+                  <span class="upload-icon">📎</span>
+                  <span class="upload-text">ファイルを選択またはドラッグ&ドロップ</span>
+                </label>
+                <div class="file-list"></div>
+              </div>
+            </div>
+            
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary">返信を送信</button>
+              {{#if request.can_be_solved_by_me}}
+              <button type="button" class="btn btn-success request-solve" data-request-id="{{request.id}}">
+                解決済みにする
+              </button>
+              {{/if}}
+            </div>
+          </form>
+        </div>
+        {{/unless}}
+        {{/unless}}
+      </div>
+    </div>
+
+    {{else}}
+    <!-- New Request Form -->
+    <div class="new-request-form">
+      <div class="form-intro">
+        <p>お困りのことがございましたら、お気軽にお問い合わせください。詳細な情報をいただけると、より迅速で的確なサポートを提供できます。</p>
+      </div>
+
+      <form class="request-form" method="post" action="{{help_center.url}}/requests" enctype="multipart/form-data">
+        <div class="form-group">
+          <label for="request-subject" class="form-label required">件名</label>
+          <input type="text" id="request-subject" name="request[subject]" class="form-input" 
+                 placeholder="問題の概要を簡潔に記入してください" required>
+        </div>
+
+        {{#if request_types}}
+        <div class="form-group">
+          <label for="request-type" class="form-label">お問い合わせの種類</label>
+          <select id="request-type" name="request[ticket_type_id]" class="form-select">
+            <option value="">選択してください</option>
+            {{#each request_types}}
+            <option value="{{id}}">{{name}}</option>
+            {{/each}}
+          </select>
+        </div>
+        {{/if}}
+
+        <div class="form-group">
+          <label for="request-description" class="form-label required">詳細</label>
+          <textarea id="request-description" name="request[comment][body]" class="form-textarea" 
+                    placeholder="問題の詳細、発生状況、試したことなどを具体的に記入してください" 
+                    required rows="8"></textarea>
+          <div class="form-hint">
+            効果的なサポートのために以下の情報を含めてください：
+            <ul>
+              <li>問題が発生する具体的な手順</li>
+              <li>期待していた結果と実際の結果</li>
+              <li>エラーメッセージ（ある場合）</li>
+              <li>使用している環境（ブラウザ、OS等）</li>
+            </ul>
+          </div>
+        </div>
+
+        {{#if priority_options}}
+        <div class="form-group">
+          <label for="request-priority" class="form-label">優先度</label>
+          <select id="request-priority" name="request[priority]" class="form-select">
+            {{#each priority_options}}
+            <option value="{{value}}" {{#if default}}selected{{/if}}>{{name}}</option>
+            {{/each}}
+          </select>
+        </div>
+        {{/if}}
+
+        {{#if custom_fields}}
+        <div class="form-section">
+          <h3>追加情報</h3>
+          {{#each custom_fields}}
+          <div class="form-group">
+            <label for="custom-field-{{id}}" class="form-label {{#if required}}required{{/if}}">
+              {{title}}
+            </label>
+            
+            {{#is type 'text'}}
+            <input type="text" id="custom-field-{{id}}" name="request[custom_fields][{{id}}]" 
+                   class="form-input" {{#if required}}required{{/if}}>
+            {{/is}}
+            
+            {{#is type 'textarea'}}
+            <textarea id="custom-field-{{id}}" name="request[custom_fields][{{id}}]" 
+                      class="form-textarea" rows="3" {{#if required}}required{{/if}}></textarea>
+            {{/is}}
+            
+            {{#is type 'dropdown'}}
+            <select id="custom-field-{{id}}" name="request[custom_fields][{{id}}]" 
+                    class="form-select" {{#if required}}required{{/if}}>
+              <option value="">選択してください</option>
+              {{#each options}}
+              <option value="{{value}}">{{name}}</option>
+              {{/each}}
+            </select>
+            {{/is}}
+            
+            {{#if description}}
+            <div class="field-description">{{description}}</div>
+            {{/if}}
+          </div>
+          {{/each}}
+        </div>
+        {{/if}}
+
+        <div class="form-group">
+          <label for="request-attachments" class="form-label">添付ファイル</label>
+          <div class="file-upload-area">
+            <input type="file" id="request-attachments" name="request[comment][attachments][]" 
+                   class="file-input" multiple accept="image/*,.pdf,.doc,.docx,.txt,.zip">
+            <label for="request-attachments" class="file-upload-label">
+              <span class="upload-icon">📎</span>
+              <span class="upload-text">ファイルを選択またはドラッグ&ドロップ</span>
+            </label>
+            <div class="file-list"></div>
+          </div>
+          <div class="file-upload-hint">
+            対応ファイル形式: 画像、PDF、Word文書、テキストファイル、ZIP（最大10MB）
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary btn-large">リクエストを送信</button>
+          <a href="{{help_center.url}}" class="btn btn-secondary">キャンセル</a>
+        </div>
+      </form>
+    </div>
+    {{/if}}
+  </main>
+
+  <aside class="request-sidebar">
+    {{#if request}}
+    <div class="request-actions">
+      <h3>アクション</h3>
+      <div class="actions-list">
+        {{#if request.can_be_solved_by_me}}
+        <button class="btn btn-success btn-small request-solve" data-request-id="{{request.id}}">
+          ✅ 解決済みにする
+        </button>
+        {{/if}}
+        
+        <a href="{{help_center.url}}/requests" class="btn btn-secondary btn-small">
+          📋 リクエスト一覧に戻る
+        </a>
+        
+        <button class="btn btn-secondary btn-small request-print" onclick="window.print()">
+          🖨️ 印刷
+        </button>
+      </div>
+    </div>
+
+    {{#if related_articles}}
+    <div class="related-articles">
+      <h3>関連記事</h3>
+      <ul class="related-articles-list">
+        {{#each related_articles}}
+        <li class="related-article-item">
+          <a href="{{url}}" class="related-article-link">{{title}}</a>
+        </li>
+        {{/each}}
+      </ul>
+    </div>
+    {{/if}}
+    {{else}}
+    <div class="request-help">
+      <h3>サポート情報</h3>
+      <div class="help-content">
+        <p>より迅速なサポートのために：</p>
+        <ul class="help-tips">
+          <li>具体的な問題の説明を記入してください</li>
+          <li>エラーメッセージがある場合は正確にコピーしてください</li>
+          <li>関連するスクリーンショットを添付してください</li>
+          <li>問題の再現手順を記載してください</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="contact-options">
+      <h3>その他の連絡方法</h3>
+      <div class="contact-list">
+        {{#if help_center.phone}}
+        <div class="contact-item">
+          <span class="contact-icon">📞</span>
+          <div class="contact-info">
+            <div class="contact-method">電話サポート</div>
+            <div class="contact-value">{{help_center.phone}}</div>
+          </div>
+        </div>
+        {{/if}}
+        
+        {{#if help_center.email}}
+        <div class="contact-item">
+          <span class="contact-icon">📧</span>
+          <div class="contact-info">
+            <div class="contact-method">メールサポート</div>
+            <div class="contact-value">{{help_center.email}}</div>
+          </div>
+        </div>
+        {{/if}}
+        
+        {{#if community.url}}
+        <div class="contact-item">
+          <span class="contact-icon">💬</span>
+          <div class="contact-info">
+            <div class="contact-method">コミュニティ</div>
+            <a href="{{community.url}}" class="contact-link">質問を投稿</a>
+          </div>
+        </div>
+        {{/if}}
+      </div>
+    </div>
+    {{/if}}
+
+    <div class="request-guidelines">
+      <h3>サポートポリシー</h3>
+      <ul class="guidelines-list">
+        <li>通常のお問い合わせは24時間以内に返信いたします</li>
+        <li>緊急のお問い合わせは優先的に対応いたします</li>
+        <li>営業時間: 平日 9:00-18:00 (祝日を除く)</li>
+        <li>詳細な情報をいただけると、より迅速な対応が可能です</li>
+      </ul>
+    </div>
+  </aside>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // File upload handling
+  const fileInputs = document.querySelectorAll('.file-input');
+  
+  fileInputs.forEach(input => {
+    const uploadArea = input.closest('.file-upload-area');
+    const fileList = uploadArea.querySelector('.file-list');
+    
+    input.addEventListener('change', function() {
+      displayFiles(this.files, fileList);
+    });
+    
+    // Drag and drop
+    uploadArea.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      this.classList.add('drag-over');
+    });
+    
+    uploadArea.addEventListener('dragleave', function(e) {
+      e.preventDefault();
+      this.classList.remove('drag-over');
+    });
+    
+    uploadArea.addEventListener('drop', function(e) {
+      e.preventDefault();
+      this.classList.remove('drag-over');
+      
+      const files = e.dataTransfer.files;
+      input.files = files;
+      displayFiles(files, fileList);
+    });
+  });
+  
+  function displayFiles(files, container) {
+    container.innerHTML = '';
+    
+    Array.from(files).forEach((file, index) => {
+      const fileItem = document.createElement('div');
+      fileItem.className = 'file-item';
+      fileItem.innerHTML = `
+        <span class="file-name">${file.name}</span>
+        <span class="file-size">(${formatFileSize(file.size)})</span>
+        <button type="button" class="file-remove" data-index="${index}">×</button>
+      `;
+      
+      container.appendChild(fileItem);
+    });
+  }
+  
+  function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  }
+  
+  // Request solve functionality
+  const solveButtons = document.querySelectorAll('.request-solve');
+  solveButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      if (confirm('このリクエストを解決済みにしますか？')) {
+        const requestId = this.dataset.requestId;
+        // API call would go here
+        console.log('Solving request', requestId);
+        
+        // Update UI
+        this.textContent = '解決済み';
+        this.disabled = true;
+        this.classList.remove('btn-success');
+        this.classList.add('btn-secondary');
+      }
+    });
+  });
+  
+  // Form validation
+  const forms = document.querySelectorAll('.request-form, .reply-form');
+  forms.forEach(form => {
+    form.addEventListener('submit', function(e) {
+      const requiredFields = form.querySelectorAll('[required]');
+      let isValid = true;
+      
+      requiredFields.forEach(field => {
+        if (!field.value.trim()) {
+          isValid = false;
+          field.classList.add('error');
+        } else {
+          field.classList.remove('error');
+        }
+      });
+      
+      if (!isValid) {
+        e.preventDefault();
+        alert('必須項目をすべて入力してください。');
+      }
+    });
+  });
+});
+</script>

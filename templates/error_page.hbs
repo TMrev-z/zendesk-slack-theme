@@ -1,0 +1,227 @@
+<div class="error-page-container">
+  <nav class="error-breadcrumbs">
+    <ol class="breadcrumbs">
+      <li class="breadcrumbs-item">
+        <a href="{{help_center.url}}">{{help_center.name}}</a>
+      </li>
+    </ol>
+  </nav>
+
+  <main class="error-main">
+    <div class="error-content">
+      <div class="error-icon">
+        {{#is status_code 404}}
+          <span class="error-emoji">🔍</span>
+        {{else}}
+          {{#is status_code 403}}
+            <span class="error-emoji">🔒</span>
+          {{else}}
+            {{#is status_code 500}}
+              <span class="error-emoji">⚠️</span>
+            {{else}}
+              <span class="error-emoji">❌</span>
+            {{/is}}
+          {{/is}}
+        {{/is}}
+      </div>
+
+      <h1 class="error-title">
+        {{#is status_code 404}}
+          ページが見つかりません
+        {{else}}
+          {{#is status_code 403}}
+            アクセス権限がありません
+          {{else}}
+            {{#is status_code 500}}
+              サーバーエラーが発生しました
+            {{else}}
+              エラーが発生しました
+            {{/is}}
+          {{/is}}
+        {{/is}}
+      </h1>
+
+      <div class="error-description">
+        {{#is status_code 404}}
+          <p>お探しのページは存在しないか、移動または削除された可能性があります。</p>
+        {{else}}
+          {{#is status_code 403}}
+            <p>このページにアクセスする権限がありません。ログインが必要な場合があります。</p>
+          {{else}}
+            {{#is status_code 500}}
+              <p>一時的なサーバーエラーが発生しました。しばらく時間をおいてから再度お試しください。</p>
+            {{else}}
+              <p>予期しないエラーが発生しました。お手数ですが、再度お試しください。</p>
+            {{/is}}
+          {{/is}}
+        {{/is}}
+      </div>
+
+      {{#if error_message}}
+      <div class="error-details">
+        <details class="error-details-expandable">
+          <summary class="error-details-summary">エラーの詳細</summary>
+          <div class="error-details-content">
+            <p>{{error_message}}</p>
+            {{#if status_code}}
+            <p><strong>エラーコード:</strong> {{status_code}}</p>
+            {{/if}}
+          </div>
+        </details>
+      </div>
+      {{/if}}
+
+      <div class="error-actions">
+        {{#is status_code 404}}
+          <a href="{{help_center.url}}" class="btn btn-primary error-home">
+            ホームに戻る
+          </a>
+          <button class="btn btn-secondary error-back" onclick="history.back()">
+            前のページに戻る
+          </button>
+          <a href="{{help_center.url}}/hc/{{locale}}/search" class="btn btn-secondary error-search">
+            検索で探す
+          </a>
+        {{else}}
+          {{#is status_code 403}}
+            <a href="{{help_center.signin_url}}" class="btn btn-primary error-signin">
+              サインイン
+            </a>
+            <a href="{{help_center.url}}" class="btn btn-secondary error-home">
+              ホームに戻る
+            </a>
+            <button class="btn btn-secondary error-back" onclick="history.back()">
+              前のページに戻る
+            </button>
+          {{else}}
+            <button class="btn btn-primary error-retry" onclick="location.reload()">
+              再読み込み
+            </button>
+            <a href="{{help_center.url}}" class="btn btn-secondary error-home">
+              ホームに戻る
+            </a>
+            <button class="btn btn-secondary error-back" onclick="history.back()">
+              前のページに戻る
+            </button>
+          {{/is}}
+        {{/is}}
+      </div>
+
+      {{#is status_code 404}}
+      <div class="error-suggestions">
+        <h3>お探しのものが見つからない場合は：</h3>
+        <ul class="suggestions-list">
+          <li>URLのスペルを確認してください</li>
+          <li>検索機能を使ってコンテンツを探してください</li>
+          <li>ナビゲーションメニューから目的のページに移動してください</li>
+          <li>問題が続く場合は、サポートにお問い合わせください</li>
+        </ul>
+      </div>
+      {{/is}}
+
+      {{#unless status_code}}
+        {{#unless status_code}}
+        <div class="error-suggestions">
+          <h3>問題解決のヒント：</h3>
+          <ul class="suggestions-list">
+            <li>ページを再読み込みしてください</li>
+            <li>インターネット接続を確認してください</li>
+            <li>しばらく時間をおいてから再度お試しください</li>
+            <li>問題が続く場合は、サポートにお問い合わせください</li>
+          </ul>
+        </div>
+        {{/unless}}
+      {{/unless}}
+    </div>
+  </main>
+
+  <aside class="error-sidebar">
+    <div class="error-help">
+      <h3>サポートが必要ですか？</h3>
+      <p>問題が解決しない場合は、お気軽にお問い合わせください。</p>
+      <div class="error-help-actions">
+        {{#if help_center.contact_us_url}}
+        <a href="{{help_center.contact_us_url}}" class="btn btn-primary error-contact">
+          お問い合わせ
+        </a>
+        {{/if}}
+        <a href="{{help_center.url}}/requests/new" class="btn btn-secondary error-request">
+          リクエストを送信
+        </a>
+      </div>
+    </div>
+
+    {{#if popular_articles}}
+    <div class="error-popular">
+      <h3>人気の記事</h3>
+      <ul class="popular-articles-list">
+        {{#each popular_articles}}
+        <li class="popular-article-item">
+          <a href="{{url}}" class="popular-article-link">{{title}}</a>
+        </li>
+        {{/each}}
+      </ul>
+    </div>
+    {{/if}}
+
+    <div class="error-quick-links">
+      <h3>クイックリンク</h3>
+      <ul class="quick-links-list">
+        <li><a href="{{help_center.url}}">ヘルプセンター</a></li>
+        <li><a href="{{help_center.url}}/hc/{{locale}}/search">検索</a></li>
+        {{#if community.url}}
+        <li><a href="{{community.url}}">コミュニティ</a></li>
+        {{/if}}
+        <li><a href="{{help_center.url}}/requests">リクエスト履歴</a></li>
+      </ul>
+    </div>
+
+    <div class="error-status">
+      <h3>サービスステータス</h3>
+      <p>現在のサービス状況を確認できます。</p>
+      {{#if status_page_url}}
+      <a href="{{status_page_url}}" target="_blank" class="btn btn-secondary error-status-link">
+        ステータスページ
+      </a>
+      {{else}}
+      <div class="service-status">
+        <div class="status-indicator status-indicator--operational">
+          <span class="status-dot"></span>
+          <span class="status-text">正常稼働中</span>
+        </div>
+      </div>
+      {{/if}}
+    </div>
+  </aside>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Error tracking
+  if (window.location.search.includes('track_error=true')) {
+    // Track error for analytics (if available)
+    if (typeof gtag !== 'undefined') {
+      gtag('event', 'exception', {
+        'description': '{{status_code}} - {{error_message}}',
+        'fatal': false
+      });
+    }
+  }
+  
+  // Auto-retry for 5xx errors after delay
+  {{#if status_code}}
+  {{#gte status_code 500}}
+  setTimeout(function() {
+    var retryBtn = document.querySelector('.error-retry');
+    if (retryBtn && !retryBtn.dataset.autoRetried) {
+      retryBtn.dataset.autoRetried = 'true';
+      retryBtn.textContent = '自動再読み込み中...';
+      setTimeout(function() {
+        location.reload();
+      }, 1000);
+    }
+  }, 5000);
+  {{/gte}}
+  {{/if}}
+});
+</script>
