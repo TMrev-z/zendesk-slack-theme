@@ -1,0 +1,299 @@
+{{#with post}}
+<div class="community-post-container">
+  <nav class="post-breadcrumbs">
+    <ol class="breadcrumbs">
+      <li class="breadcrumbs-item">
+        <a href="{{help_center.url}}">{{help_center.name}}</a>
+      </li>
+      <li class="breadcrumbs-item">
+        <a href="{{community.url}}">コミュニティ</a>
+      </li>
+      {{#if topic}}
+      <li class="breadcrumbs-item">
+        <a href="{{topic.url}}">{{topic.name}}</a>
+      </li>
+      {{/if}}
+    </ol>
+  </nav>
+
+  <main class="post-main">
+    <article class="post-article">
+      <header class="post-header">
+        <div class="post-status-bar">
+          {{#if status}}
+          <div class="post-status post-status--{{status}}">
+            {{#is status 'solved'}}
+              <span class="post-status-icon">✅</span>
+              <span class="post-status-text">解決済み</span>
+            {{/is}}
+            {{#is status 'answered'}}
+              <span class="post-status-icon">💬</span>
+              <span class="post-status-text">回答済み</span>
+            {{/is}}
+            {{#is status 'open'}}
+              <span class="post-status-icon">🔓</span>
+              <span class="post-status-text">議論中</span>
+            {{/is}}
+          </div>
+          {{/if}}
+        </div>
+
+        <h1 class="post-title">{{title}}</h1>
+        
+        <div class="post-meta-header">
+          <div class="post-author-info">
+            {{#if author.avatar_url}}
+            <img src="{{author.avatar_url}}" alt="{{author.name}}" class="post-author-avatar" loading="lazy">
+            {{/if}}
+            <div class="post-author-details">
+              <span class="post-author-name">{{author.name}}</span>
+              <div class="post-dates">
+                <time class="post-created" datetime="{{created_at}}">
+                  投稿日: {{date created_at}}
+                </time>
+                {{#if edited_at}}
+                <time class="post-edited" datetime="{{edited_at}}">
+                  編集: {{date edited_at timeago=true}}
+                </time>
+                {{/if}}
+              </div>
+            </div>
+          </div>
+
+          <div class="post-actions">
+            {{#if current_user}}
+            {{#unless closed}}
+            <button class="btn btn-secondary post-follow" data-post-id="{{id}}">
+              {{#if following}}フォロー中{{else}}フォローする{{/if}}
+            </button>
+            {{/unless}}
+            {{#if current_user.agent}}
+            <div class="post-admin-actions">
+              {{#unless closed}}
+              <button class="btn btn-secondary post-close" data-post-id="{{id}}">
+                クローズ
+              </button>
+              {{/unless}}
+              {{#if pinned}}
+              <button class="btn btn-secondary post-unpin" data-post-id="{{id}}">
+                ピン解除
+              </button>
+              {{else}}
+              <button class="btn btn-secondary post-pin" data-post-id="{{id}}">
+                ピン留め
+              </button>
+              {{/if}}
+            </div>
+            {{/if}}
+            {{/if}}
+          </div>
+        </div>
+
+        {{#if labels}}
+        <div class="post-labels-header">
+          {{#each labels}}
+          <span class="post-label">{{name}}</span>
+          {{/each}}
+        </div>
+        {{/if}}
+      </header>
+
+      <div class="post-content">
+        <div class="post-body">{{{details}}}</div>
+        
+        {{#if attachments}}
+        <div class="post-attachments">
+          <h4>添付ファイル</h4>
+          <ul class="attachment-list">
+            {{#each attachments}}
+            <li class="attachment-item">
+              <a href="{{url}}" class="attachment-link" target="_blank">
+                📎 {{filename}}
+                {{#if size}}<span class="attachment-size">({{size}})</span>{{/if}}
+              </a>
+            </li>
+            {{/each}}
+          </ul>
+        </div>
+        {{/if}}
+      </div>
+
+      <footer class="post-footer">
+        <div class="post-voting">
+          {{#if current_user}}
+          {{#unless closed}}
+          <div class="vote-buttons">
+            <button class="vote-btn vote-btn--up {{#if current_vote.up}}vote-btn--active{{/if}}" 
+                    data-post-id="{{id}}" data-vote="up">
+              <span class="vote-icon">👍</span>
+              <span class="vote-count">{{vote_up}}</span>
+            </button>
+            <button class="vote-btn vote-btn--down {{#if current_vote.down}}vote-btn--active{{/if}}" 
+                    data-post-id="{{id}}" data-vote="down">
+              <span class="vote-icon">👎</span>
+              <span class="vote-count">{{vote_down}}</span>
+            </button>
+          </div>
+          {{/unless}}
+          {{else}}
+          <div class="vote-display">
+            <div class="vote-score">
+              <span class="vote-score-number">{{vote_sum}}</span>
+              <span class="vote-score-label">投票</span>
+            </div>
+          </div>
+          {{/if}}
+        </div>
+
+        <div class="post-share">
+          <span class="share-label">共有:</span>
+          <button class="share-btn" onclick="navigator.clipboard.writeText(window.location.href)">
+            🔗 リンクをコピー
+          </button>
+        </div>
+      </footer>
+    </article>
+
+    <!-- Comments Section -->
+    <section class="post-comments">
+      <header class="comments-header">
+        <h3 class="comments-title">
+          コメント
+          {{#if comment_count}}
+          <span class="comments-count">({{comment_count}})</span>
+          {{/if}}
+        </h3>
+        
+        {{#if current_user}}
+        {{#unless closed}}
+        <div class="comments-sort">
+          <select class="comments-sort-select">
+            <option value="oldest">古い順</option>
+            <option value="newest">新しい順</option>
+            <option value="votes">投票順</option>
+          </select>
+        </div>
+        {{/unless}}
+        {{/if}}
+      </header>
+
+      {{#if comments}}
+      <ul class="comments-list">
+        {{#each comments}}
+        <li class="comment-item" id="comment-{{id}}">
+          <article class="comment">
+            <div class="comment-author-info">
+              {{#if author.avatar_url}}
+              <img src="{{author.avatar_url}}" alt="{{author.name}}" class="comment-author-avatar" loading="lazy">
+              {{/if}}
+              <div class="comment-author-details">
+                <span class="comment-author-name">{{author.name}}</span>
+                <time class="comment-created" datetime="{{created_at}}">
+                  {{date created_at timeago=true}}
+                </time>
+              </div>
+            </div>
+
+            <div class="comment-content">
+              <div class="comment-body">{{{body}}}</div>
+              
+              <div class="comment-actions">
+                {{#if current_user}}
+                {{#unless ../closed}}
+                <button class="comment-vote-btn {{#if current_vote.up}}comment-vote-btn--active{{/if}}" 
+                        data-comment-id="{{id}}" data-vote="up">
+                  👍 {{vote_sum}}
+                </button>
+                <button class="comment-reply-btn" data-comment-id="{{id}}">
+                  返信
+                </button>
+                {{#if current_user.agent}}
+                <button class="comment-delete-btn" data-comment-id="{{id}}">
+                  削除
+                </button>
+                {{/if}}
+                {{/unless}}
+                {{/if}}
+              </div>
+            </div>
+          </article>
+        </li>
+        {{/each}}
+      </ul>
+      {{/if}}
+
+      <!-- Comment Form -->
+      {{#if current_user}}
+      {{#unless closed}}
+      <div class="comment-form-wrapper">
+        <form class="comment-form" data-post-id="{{id}}">
+          <div class="comment-form-header">
+            {{#if current_user.avatar_url}}
+            <img src="{{current_user.avatar_url}}" alt="{{current_user.name}}" class="comment-form-avatar" loading="lazy">
+            {{/if}}
+            <span class="comment-form-author">{{current_user.name}}</span>
+          </div>
+          
+          <div class="comment-form-body">
+            <textarea class="comment-textarea" name="comment_body" placeholder="コメントを入力..." required></textarea>
+          </div>
+          
+          <div class="comment-form-actions">
+            <button type="submit" class="btn btn-primary comment-submit">
+              コメントする
+            </button>
+            <button type="button" class="btn btn-secondary comment-cancel" style="display: none;">
+              キャンセル
+            </button>
+          </div>
+        </form>
+      </div>
+      {{else}}
+      <div class="post-closed-notice">
+        <p>この投稿はクローズされているため、コメントできません。</p>
+      </div>
+      {{/unless}}
+      {{else}}
+      <div class="comment-signin-prompt">
+        <p>コメントするには<a href="{{help_center.signin_url}}">サインイン</a>してください。</p>
+      </div>
+      {{/if}}
+    </section>
+  </main>
+
+  <aside class="post-sidebar">
+    {{#if topic}}
+    <div class="post-topic-info">
+      <h4>トピック</h4>
+      <a href="{{topic.url}}" class="topic-link-sidebar">{{topic.name}}</a>
+      {{#if topic.description}}
+      <p class="topic-description">{{topic.description}}</p>
+      {{/if}}
+    </div>
+    {{/if}}
+
+    {{#if related_posts}}
+    <div class="related-posts">
+      <h4>関連する投稿</h4>
+      <ul class="related-posts-list">
+        {{#each related_posts}}
+        <li class="related-post-item">
+          <a href="{{url}}" class="related-post-link">{{title}}</a>
+          <div class="related-post-meta">
+            <span class="related-post-votes">{{vote_sum}} 票</span>
+            <span class="related-post-comments">{{comment_count}} コメント</span>
+          </div>
+        </li>
+        {{/each}}
+      </ul>
+    </div>
+    {{/if}}
+
+    <div class="post-return">
+      <a href="{{community.url}}{{#if topic}}?topic={{topic.id}}{{/if}}" class="btn btn-secondary">
+        {{#if topic}}{{topic.name}}に戻る{{else}}コミュニティに戻る{{/if}}
+      </a>
+    </div>
+  </aside>
+</div>
+{{/with}}
