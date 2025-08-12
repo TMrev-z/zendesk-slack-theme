@@ -1,0 +1,647 @@
+<div class="requests-page-container">
+  <nav class="requests-breadcrumbs">
+    <ol class="breadcrumbs">
+      <li class="breadcrumbs-item">
+        <a href="{{help_center.url}}">{{help_center.name}}</a>
+      </li>
+      <li class="breadcrumbs-item">
+        サポートリクエスト
+      </li>
+    </ol>
+  </nav>
+
+  <header class="requests-header">
+    <div class="requests-header-main">
+      <h1 class="requests-title">サポートリクエスト</h1>
+      <p class="requests-description">
+        あなたが送信したサポートリクエストの一覧です。各リクエストの進捗状況を確認できます。
+      </p>
+    </div>
+    
+    <div class="requests-actions">
+      <a href="{{help_center.url}}/requests/new" class="btn btn-primary requests-new">
+        <span class="btn-icon">➕</span>
+        <span class="btn-text">新しいリクエスト</span>
+      </a>
+    </div>
+  </header>
+
+  <main class="requests-main">
+    <!-- Filters and Search -->
+    <div class="requests-filters">
+      <div class="filters-section">
+        <div class="filter-group">
+          <label for="status-filter" class="filter-label">ステータス</label>
+          <select id="status-filter" class="filter-select">
+            <option value="">すべて</option>
+            <option value="new">新規</option>
+            <option value="open">対応中</option>
+            <option value="pending">保留中</option>
+            <option value="solved">解決済み</option>
+            <option value="closed">完了</option>
+          </select>
+        </div>
+        
+        <div class="filter-group">
+          <label for="priority-filter" class="filter-label">優先度</label>
+          <select id="priority-filter" class="filter-select">
+            <option value="">すべて</option>
+            <option value="urgent">緊急</option>
+            <option value="high">高</option>
+            <option value="normal">通常</option>
+            <option value="low">低</option>
+          </select>
+        </div>
+        
+        <div class="filter-group">
+          <label for="date-filter" class="filter-label">期間</label>
+          <select id="date-filter" class="filter-select">
+            <option value="">すべて</option>
+            <option value="today">今日</option>
+            <option value="week">1週間以内</option>
+            <option value="month">1ヶ月以内</option>
+            <option value="quarter">3ヶ月以内</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="search-section">
+        <div class="search-group">
+          <label for="request-search" class="search-label">検索</label>
+          <div class="search-input-wrapper">
+            <input type="text" id="request-search" class="search-input" 
+                   placeholder="件名やIDで検索...">
+            <button type="button" class="search-btn" onclick="searchRequests()">
+              <span class="search-icon">🔍</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Requests Statistics -->
+    <div class="requests-stats">
+      <div class="stats-grid">
+        <div class="stat-card stat-card--total">
+          <div class="stat-icon">📊</div>
+          <div class="stat-content">
+            <div class="stat-number">{{requests.total_count}}</div>
+            <div class="stat-label">総リクエスト数</div>
+          </div>
+        </div>
+        
+        <div class="stat-card stat-card--open">
+          <div class="stat-icon">📖</div>
+          <div class="stat-content">
+            <div class="stat-number">{{requests.open_count}}</div>
+            <div class="stat-label">対応中</div>
+          </div>
+        </div>
+        
+        <div class="stat-card stat-card--solved">
+          <div class="stat-icon">✅</div>
+          <div class="stat-content">
+            <div class="stat-number">{{requests.solved_count}}</div>
+            <div class="stat-label">解決済み</div>
+          </div>
+        </div>
+        
+        <div class="stat-card stat-card--pending">
+          <div class="stat-icon">⏳</div>
+          <div class="stat-content">
+            <div class="stat-number">{{requests.pending_count}}</div>
+            <div class="stat-label">保留中</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Requests List -->
+    <div class="requests-content">
+      {{#if requests}}
+      <div class="requests-list">
+        <div class="list-header">
+          <div class="list-controls">
+            <div class="view-options">
+              <button class="view-btn view-btn--active" data-view="card" title="カード表示">
+                <span class="view-icon">▦</span>
+              </button>
+              <button class="view-btn" data-view="table" title="テーブル表示">
+                <span class="view-icon">☰</span>
+              </button>
+            </div>
+            
+            <div class="sort-options">
+              <label for="sort-select" class="sort-label">並び順:</label>
+              <select id="sort-select" class="sort-select">
+                <option value="updated_desc">更新日時（新しい順）</option>
+                <option value="updated_asc">更新日時（古い順）</option>
+                <option value="created_desc">作成日時（新しい順）</option>
+                <option value="created_asc">作成日時（古い順）</option>
+                <option value="status">ステータス順</option>
+                <option value="priority">優先度順</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card View -->
+        <div class="requests-grid" id="requests-grid">
+          {{#each requests}}
+          <article class="request-card" data-status="{{status}}" data-priority="{{priority}}">
+            <div class="request-card-header">
+              <div class="request-id">
+                <span class="id-label">#{{id}}</span>
+              </div>
+              
+              <div class="request-status-badges">
+                <span class="status-badge status-badge--{{status}}">
+                  <span class="status-icon">
+                    {{#is status 'new'}}🆕{{/is}}
+                    {{#is status 'open'}}📖{{/is}}
+                    {{#is status 'pending'}}⏳{{/is}}
+                    {{#is status 'solved'}}✅{{/is}}
+                    {{#is status 'closed'}}📁{{/is}}
+                  </span>
+                  <span class="status-text">
+                    {{#is status 'new'}}新規{{/is}}
+                    {{#is status 'open'}}対応中{{/is}}
+                    {{#is status 'pending'}}保留中{{/is}}
+                    {{#is status 'solved'}}解決済み{{/is}}
+                    {{#is status 'closed'}}完了{{/is}}
+                  </span>
+                </span>
+                
+                {{#if priority}}
+                <span class="priority-badge priority-badge--{{priority}}">
+                  <span class="priority-icon">
+                    {{#is priority 'urgent'}}🔴{{/is}}
+                    {{#is priority 'high'}}🟠{{/is}}
+                    {{#is priority 'normal'}}🟡{{/is}}
+                    {{#is priority 'low'}}🟢{{/is}}
+                  </span>
+                  <span class="priority-text">
+                    {{#is priority 'urgent'}}緊急{{/is}}
+                    {{#is priority 'high'}}高{{/is}}
+                    {{#is priority 'normal'}}通常{{/is}}
+                    {{#is priority 'low'}}低{{/is}}
+                  </span>
+                </span>
+                {{/if}}
+              </div>
+            </div>
+
+            <div class="request-card-body">
+              <h3 class="request-subject">
+                <a href="{{url}}" class="subject-link">{{subject}}</a>
+              </h3>
+              
+              {{#if description}}
+              <p class="request-excerpt">{{excerpt description characters=120}}</p>
+              {{/if}}
+            </div>
+
+            <div class="request-card-meta">
+              <div class="request-dates">
+                <div class="created-date">
+                  <span class="date-icon">📅</span>
+                  <span class="date-text">作成: {{date created_at}}</span>
+                </div>
+                
+                {{#if updated_at}}
+                <div class="updated-date">
+                  <span class="date-icon">🔄</span>
+                  <span class="date-text">更新: {{date updated_at timeago=true}}</span>
+                </div>
+                {{/if}}
+              </div>
+              
+              <div class="request-activity">
+                {{#if comment_count}}
+                <div class="activity-item">
+                  <span class="activity-icon">💬</span>
+                  <span class="activity-count">{{comment_count}}</span>
+                </div>
+                {{/if}}
+                
+                {{#if assignee}}
+                <div class="assignee-info">
+                  <span class="assignee-label">担当:</span>
+                  {{#if assignee.avatar_url}}
+                  <img src="{{assignee.avatar_url}}" alt="{{assignee.name}}" class="assignee-avatar" loading="lazy">
+                  {{/if}}
+                  <span class="assignee-name">{{assignee.name}}</span>
+                </div>
+                {{/if}}
+              </div>
+            </div>
+
+            <div class="request-card-actions">
+              <a href="{{url}}" class="btn btn-primary btn-small">詳細を見る</a>
+              
+              {{#unless solved}}
+              {{#unless closed}}
+              <button class="btn btn-secondary btn-small request-update" data-request-id="{{id}}">
+                更新する
+              </button>
+              {{/unless}}
+              {{/unless}}
+            </div>
+          </article>
+          {{/each}}
+        </div>
+
+        <!-- Table View -->
+        <div class="requests-table" id="requests-table" style="display: none;">
+          <table class="table">
+            <thead class="table-header">
+              <tr>
+                <th class="table-th table-th--id">ID</th>
+                <th class="table-th table-th--subject">件名</th>
+                <th class="table-th table-th--status">ステータス</th>
+                <th class="table-th table-th--priority">優先度</th>
+                <th class="table-th table-th--created">作成日</th>
+                <th class="table-th table-th--updated">更新日</th>
+                <th class="table-th table-th--assignee">担当者</th>
+                <th class="table-th table-th--actions">アクション</th>
+              </tr>
+            </thead>
+            <tbody class="table-body">
+              {{#each requests}}
+              <tr class="table-row" data-status="{{status}}" data-priority="{{priority}}">
+                <td class="table-td table-td--id">
+                  <a href="{{url}}" class="id-link">#{{id}}</a>
+                </td>
+                <td class="table-td table-td--subject">
+                  <a href="{{url}}" class="subject-link">{{subject}}</a>
+                </td>
+                <td class="table-td table-td--status">
+                  <span class="status-badge status-badge--{{status}} status-badge--compact">
+                    {{#is status 'new'}}新規{{/is}}
+                    {{#is status 'open'}}対応中{{/is}}
+                    {{#is status 'pending'}}保留中{{/is}}
+                    {{#is status 'solved'}}解決済み{{/is}}
+                    {{#is status 'closed'}}完了{{/is}}
+                  </span>
+                </td>
+                <td class="table-td table-td--priority">
+                  {{#if priority}}
+                  <span class="priority-badge priority-badge--{{priority}} priority-badge--compact">
+                    {{#is priority 'urgent'}}緊急{{/is}}
+                    {{#is priority 'high'}}高{{/is}}
+                    {{#is priority 'normal'}}通常{{/is}}
+                    {{#is priority 'low'}}低{{/is}}
+                  </span>
+                  {{else}}
+                  <span class="priority-none">-</span>
+                  {{/if}}
+                </td>
+                <td class="table-td table-td--created">
+                  <time datetime="{{created_at}}">{{date created_at 'short'}}</time>
+                </td>
+                <td class="table-td table-td--updated">
+                  {{#if updated_at}}
+                  <time datetime="{{updated_at}}">{{date updated_at timeago=true}}</time>
+                  {{else}}
+                  <span class="date-none">-</span>
+                  {{/if}}
+                </td>
+                <td class="table-td table-td--assignee">
+                  {{#if assignee}}
+                  <div class="assignee-compact">
+                    {{#if assignee.avatar_url}}
+                    <img src="{{assignee.avatar_url}}" alt="{{assignee.name}}" class="assignee-avatar-small" loading="lazy">
+                    {{/if}}
+                    <span class="assignee-name-short">{{assignee.name}}</span>
+                  </div>
+                  {{else}}
+                  <span class="assignee-none">未割り当て</span>
+                  {{/if}}
+                </td>
+                <td class="table-td table-td--actions">
+                  <div class="table-actions">
+                    <a href="{{url}}" class="btn btn-link btn-small">詳細</a>
+                    {{#unless solved}}
+                    {{#unless closed}}
+                    <button class="btn btn-link btn-small request-update" data-request-id="{{id}}">
+                      更新
+                    </button>
+                    {{/unless}}
+                    {{/unless}}
+                  </div>
+                </td>
+              </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <!-- Pagination -->
+      {{pagination}}
+      
+      {{else}}
+      <div class="requests-empty">
+        <div class="empty-state">
+          <div class="empty-state-icon">📋</div>
+          <h3 class="empty-state-title">リクエストがありません</h3>
+          <p class="empty-state-description">
+            まだサポートリクエストを送信していません。<br>
+            お困りのことがございましたら、お気軽にお問い合わせください。
+          </p>
+          <div class="empty-state-actions">
+            <a href="{{help_center.url}}/requests/new" class="btn btn-primary">
+              最初のリクエストを送信
+            </a>
+            <a href="{{help_center.url}}" class="btn btn-secondary">
+              ヘルプセンターを見る
+            </a>
+          </div>
+        </div>
+      </div>
+      {{/if}}
+    </div>
+  </main>
+
+  <!-- Sidebar -->
+  <aside class="requests-sidebar">
+    <!-- Quick Actions -->
+    <div class="sidebar-section quick-actions">
+      <h3 class="sidebar-title">🚀 クイックアクション</h3>
+      <div class="quick-actions-list">
+        <a href="{{help_center.url}}/requests/new" class="quick-action">
+          <div class="action-icon">➕</div>
+          <div class="action-text">新しいリクエスト</div>
+        </a>
+        
+        {{#if help_center.phone}}
+        <a href="tel:{{help_center.phone}}" class="quick-action">
+          <div class="action-icon">📞</div>
+          <div class="action-text">電話サポート</div>
+        </a>
+        {{/if}}
+        
+        {{#if community.url}}
+        <a href="{{community.url}}" class="quick-action">
+          <div class="action-icon">💬</div>
+          <div class="action-text">コミュニティ</div>
+        </a>
+        {{/if}}
+        
+        <a href="{{help_center.url}}/hc/{{locale}}/search" class="quick-action">
+          <div class="action-icon">🔍</div>
+          <div class="action-text">記事を検索</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Support Information -->
+    <div class="sidebar-section support-info">
+      <h3 class="sidebar-title">📋 サポート情報</h3>
+      <div class="support-details">
+        <div class="support-item">
+          <div class="support-label">営業時間</div>
+          <div class="support-value">平日 9:00-18:00</div>
+        </div>
+        
+        <div class="support-item">
+          <div class="support-label">平均回答時間</div>
+          <div class="support-value">24時間以内</div>
+        </div>
+        
+        <div class="support-item">
+          <div class="support-label">解決率</div>
+          <div class="support-value">95%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tips -->
+    <div class="sidebar-section support-tips">
+      <h3 class="sidebar-title">💡 ヒント</h3>
+      <div class="tips-list">
+        <div class="tip-item">
+          <div class="tip-icon">🔄</div>
+          <div class="tip-text">リクエストの更新により、対応の優先度が上がります</div>
+        </div>
+        
+        <div class="tip-item">
+          <div class="tip-icon">📎</div>
+          <div class="tip-text">スクリーンショットの添付で解決が早まります</div>
+        </div>
+        
+        <div class="tip-item">
+          <div class="tip-icon">🏷️</div>
+          <div class="tip-text">適切な優先度の設定で効率的なサポートを</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Activity -->
+    {{#if recent_activity}}
+    <div class="sidebar-section recent-activity">
+      <h3 class="sidebar-title">🕒 最近の活動</h3>
+      <ul class="activity-list">
+        {{#each recent_activity}}
+        <li class="activity-item">
+          <div class="activity-icon">
+            {{#is type 'comment'}}💬{{/is}}
+            {{#is type 'status_change'}}🔄{{/is}}
+            {{#is type 'assignment'}}👤{{/is}}
+          </div>
+          <div class="activity-content">
+            <div class="activity-text">{{description}}</div>
+            <div class="activity-time">{{date timestamp timeago=true}}</div>
+          </div>
+        </li>
+        {{/each}}
+      </ul>
+    </div>
+    {{/if}}
+  </aside>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  initializeRequestsPage();
+});
+
+function initializeRequestsPage() {
+  setupFilters();
+  setupSearch();
+  setupViewToggle();
+  setupSorting();
+}
+
+// Filter functionality
+function setupFilters() {
+  const filters = ['status-filter', 'priority-filter', 'date-filter'];
+  
+  filters.forEach(filterId => {
+    const filter = document.getElementById(filterId);
+    if (filter) {
+      filter.addEventListener('change', applyFilters);
+    }
+  });
+}
+
+function applyFilters() {
+  const statusFilter = document.getElementById('status-filter').value;
+  const priorityFilter = document.getElementById('priority-filter').value;
+  const dateFilter = document.getElementById('date-filter').value;
+  
+  const cards = document.querySelectorAll('.request-card, .table-row');
+  
+  cards.forEach(card => {
+    let visible = true;
+    
+    // Status filter
+    if (statusFilter && card.dataset.status !== statusFilter) {
+      visible = false;
+    }
+    
+    // Priority filter
+    if (priorityFilter && card.dataset.priority !== priorityFilter) {
+      visible = false;
+    }
+    
+    // Date filter (simplified - would need actual date comparison)
+    // if (dateFilter) {
+    //   // Date filtering logic would go here
+    // }
+    
+    card.style.display = visible ? '' : 'none';
+  });
+}
+
+// Search functionality
+function setupSearch() {
+  const searchInput = document.getElementById('request-search');
+  if (searchInput) {
+    searchInput.addEventListener('input', debounce(searchRequests, 300));
+    searchInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        searchRequests();
+      }
+    });
+  }
+}
+
+function searchRequests() {
+  const query = document.getElementById('request-search').value.toLowerCase().trim();
+  const cards = document.querySelectorAll('.request-card, .table-row');
+  
+  if (!query) {
+    cards.forEach(card => card.style.display = '');
+    return;
+  }
+  
+  cards.forEach(card => {
+    const subjectElement = card.querySelector('.subject-link');
+    const idElement = card.querySelector('.id-link, .id-label');
+    
+    const subject = subjectElement ? subjectElement.textContent.toLowerCase() : '';
+    const id = idElement ? idElement.textContent.toLowerCase() : '';
+    
+    const matches = subject.includes(query) || id.includes(query);
+    card.style.display = matches ? '' : 'none';
+  });
+}
+
+// View toggle functionality
+function setupViewToggle() {
+  const viewButtons = document.querySelectorAll('.view-btn');
+  const gridView = document.getElementById('requests-grid');
+  const tableView = document.getElementById('requests-table');
+  
+  viewButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const view = this.dataset.view;
+      
+      // Update button states
+      viewButtons.forEach(btn => btn.classList.remove('view-btn--active'));
+      this.classList.add('view-btn--active');
+      
+      // Toggle views
+      if (view === 'card') {
+        gridView.style.display = '';
+        tableView.style.display = 'none';
+      } else {
+        gridView.style.display = 'none';
+        tableView.style.display = '';
+      }
+      
+      // Save preference
+      localStorage.setItem('requests_view', view);
+    });
+  });
+  
+  // Load saved view preference
+  const savedView = localStorage.getItem('requests_view');
+  if (savedView === 'table') {
+    document.querySelector('[data-view="table"]').click();
+  }
+}
+
+// Sorting functionality
+function setupSorting() {
+  const sortSelect = document.getElementById('sort-select');
+  if (sortSelect) {
+    sortSelect.addEventListener('change', sortRequests);
+  }
+}
+
+function sortRequests() {
+  const sortValue = document.getElementById('sort-select').value;
+  const container = document.getElementById('requests-grid');
+  const cards = Array.from(container.querySelectorAll('.request-card'));
+  
+  cards.sort((a, b) => {
+    switch(sortValue) {
+      case 'updated_desc':
+        return new Date(b.querySelector('.updated-date .date-text').textContent) - 
+               new Date(a.querySelector('.updated-date .date-text').textContent);
+      case 'updated_asc':
+        return new Date(a.querySelector('.updated-date .date-text').textContent) - 
+               new Date(b.querySelector('.updated-date .date-text').textContent);
+      case 'created_desc':
+        return new Date(b.querySelector('.created-date .date-text').textContent) - 
+               new Date(a.querySelector('.created-date .date-text').textContent);
+      case 'created_asc':
+        return new Date(a.querySelector('.created-date .date-text').textContent) - 
+               new Date(b.querySelector('.created-date .date-text').textContent);
+      case 'status':
+        return a.dataset.status.localeCompare(b.dataset.status);
+      case 'priority':
+        const priorityOrder = { urgent: 0, high: 1, normal: 2, low: 3 };
+        return priorityOrder[a.dataset.priority] - priorityOrder[b.dataset.priority];
+      default:
+        return 0;
+    }
+  });
+  
+  cards.forEach(card => container.appendChild(card));
+}
+
+// Utility function for debouncing search
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
+
+// Request update functionality
+document.addEventListener('click', function(e) {
+  if (e.target.classList.contains('request-update')) {
+    const requestId = e.target.dataset.requestId;
+    // This would typically open a modal or navigate to an update page
+    window.location.href = `{{help_center.url}}/requests/${requestId}`;
+  }
+});
+</script>
