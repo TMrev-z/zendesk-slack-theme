@@ -1,0 +1,394 @@
+<div class="contributions-container">
+  <nav class="contributions-breadcrumbs">
+    <ol class="breadcrumbs">
+      <li class="breadcrumbs-item">
+        <a href="{{help_center.url}}">{{help_center.name}}</a>
+      </li>
+      <li class="breadcrumbs-item">
+        <a href="{{community.url}}">コミュニティ</a>
+      </li>
+    </ol>
+  </nav>
+
+  <header class="contributions-header">
+    <div class="contributions-header-content">
+      <h1 class="contributions-title">
+        {{#if user}}
+        {{user.name}}さんの貢献
+        {{else}}
+        コミュニティ貢献
+        {{/if}}
+      </h1>
+      <div class="contributions-description">
+        {{#if user}}
+        <p>{{user.name}}さんのコミュニティへの貢献を確認できます。</p>
+        {{else}}
+        <p>コミュニティメンバーの貢献を確認しましょう。</p>
+        {{/if}}
+      </div>
+    </div>
+
+    {{#if user}}
+    <div class="user-profile">
+      {{#if user.avatar_url}}
+      <img src="{{user.avatar_url}}" alt="{{user.name}}" class="user-avatar" loading="lazy">
+      {{/if}}
+      <div class="user-info">
+        <div class="user-name">{{user.name}}</div>
+        {{#if user.title}}
+        <div class="user-title">{{user.title}}</div>
+        {{/if}}
+        {{#if user.created_at}}
+        <div class="user-joined">
+          {{date user.created_at}}に参加
+        </div>
+        {{/if}}
+      </div>
+    </div>
+    {{/if}}
+  </header>
+
+  <main class="contributions-main">
+    {{#if user}}
+    <!-- User-specific contributions -->
+    <div class="contributions-stats">
+      <h2>貢献統計</h2>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-number">{{user.posts_count}}</div>
+          <div class="stat-label">投稿</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">{{user.comments_count}}</div>
+          <div class="stat-label">コメント</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">{{user.votes_received}}</div>
+          <div class="stat-label">受け取った投票</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">{{user.solutions_count}}</div>
+          <div class="stat-label">解決した質問</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="contributions-content">
+      <div class="contributions-tabs">
+        <nav class="tabs-nav">
+          <button class="tab-btn tab-btn--active" data-tab="posts">投稿</button>
+          <button class="tab-btn" data-tab="comments">コメント</button>
+          <button class="tab-btn" data-tab="solutions">解決策</button>
+          <button class="tab-btn" data-tab="votes">投票</button>
+        </nav>
+      </div>
+
+      <!-- Posts Tab -->
+      <div class="tab-content tab-content--active" id="posts-tab">
+        {{#if user.posts}}
+        <div class="contributions-list">
+          <h3>投稿した記事 ({{user.posts.length}})</h3>
+          <ul class="posts-list">
+            {{#each user.posts}}
+            <li class="contribution-item">
+              <article class="contribution-post">
+                <div class="contribution-stats">
+                  <div class="contribution-votes">
+                    <span class="votes-count">{{vote_sum}}</span>
+                    <span class="votes-label">投票</span>
+                  </div>
+                  <div class="contribution-comments">
+                    <span class="comments-count">{{comment_count}}</span>
+                    <span class="comments-label">コメント</span>
+                  </div>
+                  {{#if status}}
+                  <div class="contribution-status contribution-status--{{status}}">
+                    {{#is status 'solved'}}
+                      <span class="status-icon">✅</span>
+                      <span class="status-text">解決済み</span>
+                    {{/is}}
+                    {{#is status 'answered'}}
+                      <span class="status-icon">💬</span>
+                      <span class="status-text">回答済み</span>
+                    {{/is}}
+                  </div>
+                  {{/if}}
+                </div>
+
+                <div class="contribution-content">
+                  <h4 class="contribution-title">
+                    <a href="{{url}}" class="contribution-link">{{title}}</a>
+                  </h4>
+                  {{#if topic}}
+                  <div class="contribution-topic">
+                    <a href="{{topic.url}}" class="topic-tag">{{topic.name}}</a>
+                  </div>
+                  {{/if}}
+                  <div class="contribution-meta">
+                    <time class="contribution-date" datetime="{{created_at}}">
+                      {{date created_at timeago=true}}
+                    </time>
+                    {{#if last_activity_at}}
+                    <time class="contribution-activity" datetime="{{last_activity_at}}">
+                      最終活動: {{date last_activity_at timeago=true}}
+                    </time>
+                    {{/if}}
+                  </div>
+                </div>
+              </article>
+            </li>
+            {{/each}}
+          </ul>
+        </div>
+        {{else}}
+        <div class="contributions-empty">
+          <div class="empty-state">
+            <div class="empty-state-icon">📝</div>
+            <h3 class="empty-state-title">投稿がありません</h3>
+            <p class="empty-state-description">まだ投稿を作成していません。</p>
+          </div>
+        </div>
+        {{/if}}
+      </div>
+
+      <!-- Comments Tab -->
+      <div class="tab-content" id="comments-tab">
+        {{#if user.comments}}
+        <div class="contributions-list">
+          <h3>コメント ({{user.comments.length}})</h3>
+          <ul class="comments-list">
+            {{#each user.comments}}
+            <li class="contribution-item">
+              <article class="contribution-comment">
+                <div class="comment-content">
+                  <div class="comment-body">{{excerpt body characters=200}}</div>
+                  <div class="comment-post-info">
+                    <span class="comment-post-label">投稿:</span>
+                    <a href="{{post.url}}" class="comment-post-link">{{post.title}}</a>
+                  </div>
+                  <div class="comment-meta">
+                    <div class="comment-votes">{{vote_sum}} 投票</div>
+                    <time class="comment-date" datetime="{{created_at}}">
+                      {{date created_at timeago=true}}
+                    </time>
+                  </div>
+                </div>
+              </article>
+            </li>
+            {{/each}}
+          </ul>
+        </div>
+        {{else}}
+        <div class="contributions-empty">
+          <div class="empty-state">
+            <div class="empty-state-icon">💬</div>
+            <h3 class="empty-state-title">コメントがありません</h3>
+            <p class="empty-state-description">まだコメントを投稿していません。</p>
+          </div>
+        </div>
+        {{/if}}
+      </div>
+
+      <!-- Solutions Tab -->
+      <div class="tab-content" id="solutions-tab">
+        {{#if user.solutions}}
+        <div class="contributions-list">
+          <h3>解決した問題 ({{user.solutions.length}})</h3>
+          <ul class="solutions-list">
+            {{#each user.solutions}}
+            <li class="contribution-item">
+              <article class="contribution-solution">
+                <div class="solution-badge">
+                  <span class="solution-icon">✅</span>
+                  <span class="solution-text">解決済み</span>
+                </div>
+                <div class="solution-content">
+                  <h4 class="solution-title">
+                    <a href="{{post.url}}" class="solution-link">{{post.title}}</a>
+                  </h4>
+                  <div class="solution-excerpt">{{excerpt solution_text characters=150}}</div>
+                  <div class="solution-meta">
+                    <time class="solution-date" datetime="{{solved_at}}">
+                      {{date solved_at timeago=true}}に解決
+                    </time>
+                    {{#if topic}}
+                    <a href="{{topic.url}}" class="solution-topic">{{topic.name}}</a>
+                    {{/if}}
+                  </div>
+                </div>
+              </article>
+            </li>
+            {{/each}}
+          </ul>
+        </div>
+        {{else}}
+        <div class="contributions-empty">
+          <div class="empty-state">
+            <div class="empty-state-icon">🎯</div>
+            <h3 class="empty-state-title">解決した問題がありません</h3>
+            <p class="empty-state-description">まだ問題を解決していません。</p>
+          </div>
+        </div>
+        {{/if}}
+      </div>
+
+      <!-- Votes Tab -->
+      <div class="tab-content" id="votes-tab">
+        {{#if user.votes}}
+        <div class="contributions-list">
+          <h3>投票履歴 ({{user.votes.length}})</h3>
+          <ul class="votes-list">
+            {{#each user.votes}}
+            <li class="contribution-item">
+              <article class="contribution-vote">
+                <div class="vote-type vote-type--{{type}}">
+                  {{#is type 'up'}}
+                    <span class="vote-icon">👍</span>
+                    <span class="vote-text">いいね</span>
+                  {{/is}}
+                  {{#is type 'down'}}
+                    <span class="vote-icon">👎</span>
+                    <span class="vote-text">よくない</span>
+                  {{/is}}
+                </div>
+                <div class="vote-content">
+                  <h4 class="vote-title">
+                    <a href="{{post.url}}" class="vote-link">{{post.title}}</a>
+                  </h4>
+                  <div class="vote-meta">
+                    <time class="vote-date" datetime="{{created_at}}">
+                      {{date created_at timeago=true}}
+                    </time>
+                    <span class="vote-author">投稿者: {{post.author.name}}</span>
+                  </div>
+                </div>
+              </article>
+            </li>
+            {{/each}}
+          </ul>
+        </div>
+        {{else}}
+        <div class="contributions-empty">
+          <div class="empty-state">
+            <div class="empty-state-icon">👍</div>
+            <h3 class="empty-state-title">投票履歴がありません</h3>
+            <p class="empty-state-description">まだ投票をしていません。</p>
+          </div>
+        </div>
+        {{/if}}
+      </div>
+    </div>
+
+    {{else}}
+    <!-- General community contributions -->
+    <div class="community-contributors">
+      <h2>アクティブな貢献者</h2>
+      {{#if contributors}}
+      <div class="contributors-grid">
+        {{#each contributors}}
+        <div class="contributor-card">
+          <a href="{{contributions_url}}" class="contributor-link">
+            {{#if avatar_url}}
+            <img src="{{avatar_url}}" alt="{{name}}" class="contributor-avatar" loading="lazy">
+            {{/if}}
+            <div class="contributor-info">
+              <div class="contributor-name">{{name}}</div>
+              {{#if title}}
+              <div class="contributor-title">{{title}}</div>
+              {{/if}}
+              <div class="contributor-stats">
+                <div class="contributor-stat">
+                  <span class="stat-value">{{posts_count}}</span>
+                  <span class="stat-label">投稿</span>
+                </div>
+                <div class="contributor-stat">
+                  <span class="stat-value">{{solutions_count}}</span>
+                  <span class="stat-label">解決</span>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+        {{/each}}
+      </div>
+      {{else}}
+      <div class="contributors-empty">
+        <p>貢献者の情報を読み込んでいます...</p>
+      </div>
+      {{/if}}
+    </div>
+    {{/if}}
+
+    <!-- Pagination -->
+    {{pagination}}
+  </main>
+
+  <aside class="contributions-sidebar">
+    {{#if user}}
+    <div class="user-badges">
+      <h3>バッジ</h3>
+      {{#if user.badges}}
+      <div class="badges-list">
+        {{#each user.badges}}
+        <div class="badge-item">
+          <div class="badge-icon">{{icon}}</div>
+          <div class="badge-info">
+            <div class="badge-name">{{name}}</div>
+            <div class="badge-description">{{description}}</div>
+          </div>
+        </div>
+        {{/each}}
+      </div>
+      {{else}}
+      <div class="badges-empty">
+        <p>まだバッジを獲得していません。</p>
+      </div>
+      {{/if}}
+    </div>
+
+    <div class="user-activity">
+      <h3>最近の活動</h3>
+      {{#if user.recent_activity}}
+      <ul class="activity-list">
+        {{#each user.recent_activity}}
+        <li class="activity-item">
+          <div class="activity-type activity-type--{{type}}">
+            {{#is type 'post'}}📝{{/is}}
+            {{#is type 'comment'}}💬{{/is}}
+            {{#is type 'vote'}}👍{{/is}}
+            {{#is type 'solution'}}✅{{/is}}
+          </div>
+          <div class="activity-content">
+            <div class="activity-description">{{description}}</div>
+            <time class="activity-date" datetime="{{created_at}}">
+              {{date created_at timeago=true}}
+            </time>
+          </div>
+        </li>
+        {{/each}}
+      </ul>
+      {{else}}
+      <div class="activity-empty">
+        <p>最近の活動がありません。</p>
+      </div>
+      {{/if}}
+    </div>
+    {{/if}}
+
+    <div class="contributions-guidelines">
+      <h3>貢献のガイドライン</h3>
+      <ul class="guidelines-list">
+        <li>有用で建設的なコンテンツを投稿しましょう</li>
+        <li>他のメンバーを助けることを心がけましょう</li>
+        <li>質問には丁寧に回答しましょう</li>
+        <li>良いコンテンツには積極的に投票しましょう</li>
+      </ul>
+    </div>
+
+    <div class="contributions-navigation">
+      <a href="{{community.url}}" class="btn btn-secondary">
+        コミュニティに戻る
+      </a>
+    </div>
+  </aside>
+</div>
