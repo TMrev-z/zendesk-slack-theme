@@ -1,0 +1,290 @@
+{{#with topic}}
+<div class="topic-page-container">
+  <nav class="topic-breadcrumbs">
+    <ol class="breadcrumbs">
+      <li class="breadcrumbs-item">
+        <a href="{{help_center.url}}">{{help_center.name}}</a>
+      </li>
+      <li class="breadcrumbs-item">
+        <a href="{{community.url}}">コミュニティ</a>
+      </li>
+      <li class="breadcrumbs-item">
+        <a href="{{community.url}}/topics">トピック</a>
+      </li>
+    </ol>
+  </nav>
+
+  <header class="topic-page-header">
+    <div class="topic-header-content">
+      <h1 class="topic-page-title">{{name}}</h1>
+      {{#if description}}
+      <div class="topic-page-description">
+        <p>{{description}}</p>
+      </div>
+      {{/if}}
+      
+      <div class="topic-meta">
+        <div class="topic-stats">
+          <div class="topic-stat-item">
+            <span class="topic-stat-number">{{post_count}}</span>
+            <span class="topic-stat-label">投稿</span>
+          </div>
+          <div class="topic-stat-item">
+            <span class="topic-stat-number">{{follower_count}}</span>
+            <span class="topic-stat-label">フォロワー</span>
+          </div>
+          {{#if created_at}}
+          <div class="topic-created">
+            <span class="topic-created-label">作成日:</span>
+            <time class="topic-created-date" datetime="{{created_at}}">
+              {{date created_at}}
+            </time>
+          </div>
+          {{/if}}
+        </div>
+      </div>
+    </div>
+    
+    <div class="topic-actions">
+      {{#if current_user}}
+      <button class="topic-follow-btn {{#if following}}topic-follow-btn--active{{/if}}" 
+              data-topic-id="{{id}}">
+        {{#if following}}
+          <span class="topic-follow-icon">✓</span>
+          <span class="topic-follow-text">フォロー中</span>
+        {{else}}
+          <span class="topic-follow-icon">+</span>
+          <span class="topic-follow-text">フォロー</span>
+        {{/if}}
+      </button>
+      <a href="{{community.url}}/posts/new?topic_id={{id}}" class="btn btn-primary topic-new-post">
+        投稿する
+      </a>
+      {{#if current_user.agent}}
+      <div class="topic-admin-actions">
+        <button class="btn btn-secondary topic-edit" data-topic-id="{{id}}">
+          編集
+        </button>
+        {{#if pinned}}
+        <button class="btn btn-secondary topic-unpin" data-topic-id="{{id}}">
+          ピン解除
+        </button>
+        {{else}}
+        <button class="btn btn-secondary topic-pin" data-topic-id="{{id}}">
+          ピン留め
+        </button>
+        {{/if}}
+      </div>
+      {{/if}}
+      {{else}}
+      <a href="{{help_center.signin_url}}" class="btn btn-secondary">
+        サインインして参加
+      </a>
+      {{/if}}
+    </div>
+  </header>
+
+  <main class="topic-main">
+    {{#if posts}}
+    <div class="topic-posts">
+      <div class="posts-header">
+        <div class="posts-count">
+          {{posts.length}} 件の投稿
+        </div>
+        
+        <div class="posts-sorting">
+          <label for="posts-sort-select">並び替え:</label>
+          <select id="posts-sort-select" class="posts-sort-select">
+            <option value="recent">最新順</option>
+            <option value="popular">人気順</option>
+            <option value="oldest">古い順</option>
+            <option value="answered">回答済み</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="posts-list-container">
+        <ul class="posts-list">
+          {{#each posts}}
+          <li class="post-item">
+            <article class="topic-post">
+              <div class="post-stats">
+                <div class="post-vote-count">
+                  <span class="vote-count">{{vote_sum}}</span>
+                  <span class="vote-label">投票</span>
+                </div>
+                
+                <div class="post-comment-count">
+                  <span class="comment-count">{{comment_count}}</span>
+                  <span class="comment-label">コメント</span>
+                </div>
+                
+                {{#if status}}
+                <div class="post-status post-status--{{status}}">
+                  {{#is status 'solved'}}
+                    <span class="post-status-icon">✅</span>
+                    <span class="post-status-text">解決</span>
+                  {{/is}}
+                  {{#is status 'answered'}}
+                    <span class="post-status-icon">💬</span>
+                    <span class="post-status-text">回答</span>
+                  {{/is}}
+                </div>
+                {{/if}}
+              </div>
+
+              <div class="post-content">
+                <h3 class="post-title">
+                  <a href="{{url}}" class="post-link">{{title}}</a>
+                </h3>
+                
+                {{#if details}}
+                <div class="post-excerpt">
+                  <p>{{excerpt details characters=200}}</p>
+                </div>
+                {{/if}}
+                
+                <div class="post-meta">
+                  <div class="post-author">
+                    {{#if author.avatar_url}}
+                    <img src="{{author.avatar_url}}" alt="{{author.name}}" class="post-author-avatar" loading="lazy">
+                    {{/if}}
+                    <span class="post-author-name">{{author.name}}</span>
+                  </div>
+                  
+                  <div class="post-dates">
+                    <time class="post-created" datetime="{{created_at}}">
+                      {{date created_at timeago=true}}
+                    </time>
+                    
+                    {{#if last_activity_at}}
+                    <time class="post-activity" datetime="{{last_activity_at}}">
+                      最終活動: {{date last_activity_at timeago=true}}
+                    </time>
+                    {{/if}}
+                  </div>
+                  
+                  {{#if labels}}
+                  <div class="post-labels">
+                    {{#each labels}}
+                    <span class="post-label">{{name}}</span>
+                    {{/each}}
+                  </div>
+                  {{/if}}
+                </div>
+              </div>
+            </article>
+          </li>
+          {{/each}}
+        </ul>
+        
+        <!-- Pagination -->
+        {{pagination}}
+      </div>
+    </div>
+    
+    {{else}}
+    <div class="topic-empty">
+      <div class="empty-state">
+        <div class="empty-state-icon">💬</div>
+        <h2 class="empty-state-title">まだ投稿がありません</h2>
+        <div class="empty-state-description">
+          <p>「{{name}}」にはまだ投稿がありません。最初の投稿をしてディスカッションを始めましょう。</p>
+        </div>
+        
+        <div class="empty-state-actions">
+          {{#if current_user}}
+          <a href="{{community.url}}/posts/new?topic_id={{id}}" class="btn btn-primary">
+            最初の投稿をする
+          </a>
+          {{else}}
+          <a href="{{help_center.signin_url}}" class="btn btn-secondary">
+            サインインして投稿
+          </a>
+          {{/if}}
+          <a href="{{community.url}}/topics" class="btn btn-secondary">
+            他のトピックを見る
+          </a>
+        </div>
+      </div>
+    </div>
+    {{/if}}
+  </main>
+
+  <aside class="topic-sidebar">
+    {{#if moderators}}
+    <div class="topic-moderators">
+      <h3>モデレーター</h3>
+      <ul class="moderators-list">
+        {{#each moderators}}
+        <li class="moderator-item">
+          <div class="moderator-info">
+            {{#if avatar_url}}
+            <img src="{{avatar_url}}" alt="{{name}}" class="moderator-avatar" loading="lazy">
+            {{/if}}
+            <span class="moderator-name">{{name}}</span>
+          </div>
+        </li>
+        {{/each}}
+      </ul>
+    </div>
+    {{/if}}
+
+    {{#if related_topics}}
+    <div class="related-topics">
+      <h3>関連トピック</h3>
+      <ul class="related-topics-list">
+        {{#each related_topics}}
+        <li class="related-topic-item">
+          <a href="{{url}}" class="related-topic-link">
+            <span class="related-topic-name">{{name}}</span>
+            <div class="related-topic-stats">
+              <span class="related-topic-posts">{{post_count}} 投稿</span>
+              <span class="related-topic-followers">{{follower_count}} フォロワー</span>
+            </div>
+          </a>
+        </li>
+        {{/each}}
+      </ul>
+    </div>
+    {{/if}}
+
+    {{#if recent_followers}}
+    <div class="recent-followers">
+      <h3>最近のフォロワー</h3>
+      <ul class="followers-list">
+        {{#each recent_followers}}
+        <li class="follower-item">
+          <div class="follower-info">
+            {{#if avatar_url}}
+            <img src="{{avatar_url}}" alt="{{name}}" class="follower-avatar" loading="lazy">
+            {{/if}}
+            <span class="follower-name">{{name}}</span>
+          </div>
+          <time class="follower-date" datetime="{{followed_at}}">
+            {{date followed_at timeago=true}}
+          </time>
+        </li>
+        {{/each}}
+      </ul>
+    </div>
+    {{/if}}
+
+    <div class="topic-guidelines">
+      <h3>投稿ガイドライン</h3>
+      <ul class="topic-guidelines-list">
+        <li>トピックに関連する内容を投稿しましょう</li>
+        <li>他の参加者を尊重しましょう</li>
+        <li>重複する質問がないか確認しましょう</li>
+        <li>明確で分かりやすいタイトルを付けましょう</li>
+      </ul>
+    </div>
+
+    <div class="topic-navigation">
+      <a href="{{community.url}}/topics" class="btn btn-secondary topic-back">
+        トピック一覧に戻る
+      </a>
+    </div>
+  </aside>
+</div>
+{{/with}}
