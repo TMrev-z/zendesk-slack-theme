@@ -4,6 +4,10 @@
   "version": "1.0.0",
   "api_version": 2,
   "default_locale": "ja",
+  "assets": {
+    "stylesheets": ["style.css"],
+    "javascripts": ["script.js"]
+  },
   "settings": [
     {
       "label": "Brand Color",
