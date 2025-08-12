@@ -1,0 +1,462 @@
+<div class="new-post-container">
+  <nav class="new-post-breadcrumbs">
+    <ol class="breadcrumbs">
+      <li class="breadcrumbs-item">
+        <a href="{{help_center.url}}">{{help_center.name}}</a>
+      </li>
+      {{#if community.url}}
+      <li class="breadcrumbs-item">
+        <a href="{{community.url}}">コミュニティ</a>
+      </li>
+      {{/if}}
+      <li class="breadcrumbs-item">
+        新しい投稿
+      </li>
+    </ol>
+  </nav>
+
+  <header class="new-post-header">
+    <div class="new-post-title-section">
+      <h1 class="new-post-title">新しい投稿を作成</h1>
+      <p class="new-post-description">
+        コミュニティメンバーと知識を共有し、質問や議論を始めましょう。
+      </p>
+    </div>
+  </header>
+
+  <main class="new-post-main">
+    <form class="new-post-form" method="post" action="{{community.url}}/posts" enctype="multipart/form-data">
+      <div class="form-section">
+        <div class="form-group">
+          <label for="post-title" class="form-label required">投稿タイトル</label>
+          <input type="text" id="post-title" name="post[title]" class="form-input form-input--large" 
+                 placeholder="投稿のタイトルを入力してください" required maxlength="255">
+          <div class="form-hint">
+            具体的で分かりやすいタイトルを付けてください（最大255文字）
+          </div>
+        </div>
+
+        {{#if topics}}
+        <div class="form-group">
+          <label for="post-topic" class="form-label">トピック</label>
+          <select id="post-topic" name="post[topic_id]" class="form-select">
+            <option value="">トピックを選択してください</option>
+            {{#each topics}}
+            <option value="{{id}}">{{name}}</option>
+            {{/each}}
+          </select>
+          <div class="form-hint">
+            投稿に最適なトピックを選択してください
+          </div>
+        </div>
+        {{/if}}
+
+        <div class="form-group">
+          <label for="post-body" class="form-label required">投稿内容</label>
+          <div class="editor-toolbar">
+            <div class="editor-format-buttons">
+              <button type="button" class="format-btn" data-format="bold" title="太字">
+                <strong>B</strong>
+              </button>
+              <button type="button" class="format-btn" data-format="italic" title="斜体">
+                <em>I</em>
+              </button>
+              <button type="button" class="format-btn" data-format="link" title="リンク">
+                🔗
+              </button>
+              <button type="button" class="format-btn" data-format="code" title="コード">
+                &lt;/&gt;
+              </button>
+              <button type="button" class="format-btn" data-format="quote" title="引用">
+                "
+              </button>
+              <button type="button" class="format-btn" data-format="list" title="リスト">
+                ≡
+              </button>
+            </div>
+          </div>
+          <textarea id="post-body" name="post[details]" class="form-textarea form-textarea--large" 
+                    placeholder="投稿の詳細を入力してください..." required rows="12"></textarea>
+          <div class="form-hint">
+            Markdown記法を使用できます。詳細な内容を記載してください。
+          </div>
+        </div>
+
+        {{#if post_types}}
+        <div class="form-group">
+          <label for="post-type" class="form-label">投稿の種類</label>
+          <div class="post-type-options">
+            {{#each post_types}}
+            <label class="post-type-option">
+              <input type="radio" name="post[post_type]" value="{{id}}" class="post-type-radio"
+                     {{#if @first}}checked{{/if}}>
+              <div class="post-type-card">
+                <div class="post-type-icon">
+                  {{#is id 'question'}}❓{{/is}}
+                  {{#is id 'idea'}}💡{{/is}}
+                  {{#is id 'problem'}}⚠️{{/is}}
+                  {{#is id 'article'}}📄{{/is}}
+                </div>
+                <div class="post-type-info">
+                  <div class="post-type-name">{{name}}</div>
+                  <div class="post-type-description">{{description}}</div>
+                </div>
+              </div>
+            </label>
+            {{/each}}
+          </div>
+        </div>
+        {{/if}}
+
+        <div class="form-group">
+          <label for="post-tags" class="form-label">タグ</label>
+          <input type="text" id="post-tags" name="post[label_names]" class="form-input" 
+                 placeholder="タグをカンマ区切りで入力（例: javascript, 初心者, 質問）">
+          <div class="form-hint">
+            関連するキーワードをタグとして追加してください（最大10個）
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="post-attachments" class="form-label">添付ファイル</label>
+          <div class="file-upload-area">
+            <input type="file" id="post-attachments" name="post[attachments][]" 
+                   class="file-input" multiple accept="image/*,.pdf,.doc,.docx,.txt,.zip">
+            <label for="post-attachments" class="file-upload-label">
+              <span class="upload-icon">📎</span>
+              <span class="upload-text">ファイルを選択またはドラッグ&ドロップ</span>
+            </label>
+            <div class="file-list"></div>
+          </div>
+          <div class="file-upload-hint">
+            対応ファイル形式: 画像、PDF、Word文書、テキストファイル、ZIP（最大10MB）
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <div class="form-actions-main">
+          <button type="submit" class="btn btn-primary btn-large">投稿を作成</button>
+          <button type="button" class="btn btn-secondary post-preview">プレビュー</button>
+        </div>
+        <div class="form-actions-secondary">
+          <a href="{{community.url}}" class="btn btn-link">キャンセル</a>
+          <button type="button" class="btn btn-link post-draft" data-action="save-draft">
+            下書き保存
+          </button>
+        </div>
+      </div>
+    </form>
+  </main>
+
+  <aside class="new-post-sidebar">
+    <div class="posting-tips">
+      <h3>投稿のコツ</h3>
+      <div class="tips-content">
+        <ul class="tips-list">
+          <li>
+            <strong>明確なタイトル:</strong>
+            問題や質問を簡潔に表現してください
+          </li>
+          <li>
+            <strong>詳細な説明:</strong>
+            背景情報や試したことを含めて記載してください
+          </li>
+          <li>
+            <strong>適切なトピック:</strong>
+            関連するトピックを選択してください
+          </li>
+          <li>
+            <strong>タグの活用:</strong>
+            検索しやすくするためにタグを追加してください
+          </li>
+          <li>
+            <strong>ファイル添付:</strong>
+            スクリーンショットやログファイルがあると理解しやすくなります
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="community-guidelines">
+      <h3>コミュニティガイドライン</h3>
+      <div class="guidelines-content">
+        <ul class="guidelines-list">
+          <li>他のメンバーを尊重し、礼儀正しくコミュニケーションしてください</li>
+          <li>重複投稿を避けるため、既存の投稿を検索してください</li>
+          <li>スパムや不適切なコンテンツは投稿しないでください</li>
+          <li>個人情報や機密情報の共有は避けてください</li>
+        </ul>
+      </div>
+    </div>
+
+    {{#if popular_topics}}
+    <div class="popular-topics">
+      <h3>人気のトピック</h3>
+      <ul class="popular-topics-list">
+        {{#each popular_topics}}
+        <li class="popular-topic-item">
+          <a href="{{url}}" class="popular-topic-link">
+            <span class="topic-name">{{name}}</span>
+            <span class="topic-count">({{posts_count}})</span>
+          </a>
+        </li>
+        {{/each}}
+      </ul>
+    </div>
+    {{/if}}
+
+    <div class="markdown-help">
+      <h3>Markdown記法</h3>
+      <div class="markdown-examples">
+        <div class="markdown-example">
+          <div class="markdown-syntax">**太字**</div>
+          <div class="markdown-result"><strong>太字</strong></div>
+        </div>
+        <div class="markdown-example">
+          <div class="markdown-syntax">*斜体*</div>
+          <div class="markdown-result"><em>斜体</em></div>
+        </div>
+        <div class="markdown-example">
+          <div class="markdown-syntax">[リンク](URL)</div>
+          <div class="markdown-result">リンク</div>
+        </div>
+        <div class="markdown-example">
+          <div class="markdown-syntax">`コード`</div>
+          <div class="markdown-result"><code>コード</code></div>
+        </div>
+        <div class="markdown-example">
+          <div class="markdown-syntax">> 引用</div>
+          <div class="markdown-result">引用</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<!-- Preview Modal -->
+<div class="preview-modal" id="preview-modal" style="display: none;">
+  <div class="preview-modal-overlay" onclick="closePreview()"></div>
+  <div class="preview-modal-content">
+    <div class="preview-modal-header">
+      <h3 class="preview-modal-title">投稿プレビュー</h3>
+      <button class="preview-modal-close" onclick="closePreview()">×</button>
+    </div>
+    <div class="preview-modal-body">
+      <div class="preview-content" id="preview-content"></div>
+    </div>
+    <div class="preview-modal-footer">
+      <button class="btn btn-primary" onclick="closePreview()">編集に戻る</button>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // File upload handling
+  const fileInput = document.getElementById('post-attachments');
+  const uploadArea = fileInput.closest('.file-upload-area');
+  const fileList = uploadArea.querySelector('.file-list');
+  
+  fileInput.addEventListener('change', function() {
+    displayFiles(this.files, fileList);
+  });
+  
+  // Drag and drop
+  uploadArea.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    this.classList.add('drag-over');
+  });
+  
+  uploadArea.addEventListener('dragleave', function(e) {
+    e.preventDefault();
+    this.classList.remove('drag-over');
+  });
+  
+  uploadArea.addEventListener('drop', function(e) {
+    e.preventDefault();
+    this.classList.remove('drag-over');
+    
+    const files = e.dataTransfer.files;
+    fileInput.files = files;
+    displayFiles(files, fileList);
+  });
+  
+  function displayFiles(files, container) {
+    container.innerHTML = '';
+    
+    Array.from(files).forEach((file, index) => {
+      const fileItem = document.createElement('div');
+      fileItem.className = 'file-item';
+      fileItem.innerHTML = `
+        <span class="file-name">${file.name}</span>
+        <span class="file-size">(${formatFileSize(file.size)})</span>
+        <button type="button" class="file-remove" data-index="${index}">×</button>
+      `;
+      
+      container.appendChild(fileItem);
+    });
+  }
+  
+  function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  }
+  
+  // Format buttons
+  const formatButtons = document.querySelectorAll('.format-btn');
+  const textarea = document.getElementById('post-body');
+  
+  formatButtons.forEach(button => {
+    button.addEventListener('click', function(e) {
+      e.preventDefault();
+      const format = this.dataset.format;
+      insertFormat(format, textarea);
+    });
+  });
+  
+  function insertFormat(format, textarea) {
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = textarea.value.substring(start, end);
+    let replacement = '';
+    
+    switch(format) {
+      case 'bold':
+        replacement = `**${selectedText || 'テキスト'}**`;
+        break;
+      case 'italic':
+        replacement = `*${selectedText || 'テキスト'}*`;
+        break;
+      case 'link':
+        replacement = `[${selectedText || 'リンクテキスト'}](URL)`;
+        break;
+      case 'code':
+        replacement = `\`${selectedText || 'コード'}\``;
+        break;
+      case 'quote':
+        replacement = `> ${selectedText || '引用テキスト'}`;
+        break;
+      case 'list':
+        replacement = `- ${selectedText || 'リスト項目'}`;
+        break;
+    }
+    
+    textarea.value = textarea.value.substring(0, start) + replacement + textarea.value.substring(end);
+    textarea.focus();
+  }
+  
+  // Preview functionality
+  const previewBtn = document.querySelector('.post-preview');
+  if (previewBtn) {
+    previewBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      showPreview();
+    });
+  }
+  
+  function showPreview() {
+    const title = document.getElementById('post-title').value;
+    const body = document.getElementById('post-body').value;
+    const topic = document.getElementById('post-topic')?.selectedOptions[0]?.textContent || '';
+    
+    const previewContent = document.getElementById('preview-content');
+    previewContent.innerHTML = `
+      <div class="preview-post">
+        <div class="preview-header">
+          <h2 class="preview-title">${title || 'タイトルなし'}</h2>
+          ${topic ? `<div class="preview-topic">${topic}</div>` : ''}
+        </div>
+        <div class="preview-body">${markdownToHtml(body) || 'コンテンツなし'}</div>
+      </div>
+    `;
+    
+    document.getElementById('preview-modal').style.display = 'block';
+  }
+  
+  function markdownToHtml(markdown) {
+    return markdown
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/`(.*?)`/g, '<code>$1</code>')
+      .replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>')
+      .replace(/^- (.+)$/gm, '<li>$1</li>')
+      .replace(/\n/g, '<br>');
+  }
+  
+  window.closePreview = function() {
+    document.getElementById('preview-modal').style.display = 'none';
+  };
+  
+  // Draft functionality
+  const draftBtn = document.querySelector('.post-draft');
+  if (draftBtn) {
+    draftBtn.addEventListener('click', function() {
+      saveDraft();
+    });
+  }
+  
+  function saveDraft() {
+    const draftData = {
+      title: document.getElementById('post-title').value,
+      body: document.getElementById('post-body').value,
+      topic_id: document.getElementById('post-topic')?.value,
+      tags: document.getElementById('post-tags').value,
+      timestamp: new Date().toISOString()
+    };
+    
+    localStorage.setItem('community_post_draft', JSON.stringify(draftData));
+    
+    // Show feedback
+    draftBtn.textContent = '保存しました';
+    draftBtn.disabled = true;
+    setTimeout(() => {
+      draftBtn.textContent = '下書き保存';
+      draftBtn.disabled = false;
+    }, 2000);
+  }
+  
+  // Load draft on page load
+  const savedDraft = localStorage.getItem('community_post_draft');
+  if (savedDraft) {
+    const draftData = JSON.parse(savedDraft);
+    if (confirm('保存された下書きがあります。読み込みますか？')) {
+      document.getElementById('post-title').value = draftData.title || '';
+      document.getElementById('post-body').value = draftData.body || '';
+      if (document.getElementById('post-topic')) {
+        document.getElementById('post-topic').value = draftData.topic_id || '';
+      }
+      document.getElementById('post-tags').value = draftData.tags || '';
+    }
+  }
+  
+  // Form validation
+  const form = document.querySelector('.new-post-form');
+  form.addEventListener('submit', function(e) {
+    const title = document.getElementById('post-title').value.trim();
+    const body = document.getElementById('post-body').value.trim();
+    
+    if (!title || !body) {
+      e.preventDefault();
+      alert('タイトルと投稿内容は必須項目です。');
+      return;
+    }
+    
+    // Clear draft on successful submission
+    localStorage.removeItem('community_post_draft');
+  });
+  
+  // Auto-save draft every 30 seconds
+  setInterval(function() {
+    const title = document.getElementById('post-title').value.trim();
+    const body = document.getElementById('post-body').value.trim();
+    
+    if (title || body) {
+      saveDraft();
+    }
+  }, 30000);
+});
+</script>

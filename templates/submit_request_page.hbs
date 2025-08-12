@@ -1,0 +1,587 @@
+<div class="submit-request-container">
+  <nav class="submit-request-breadcrumbs">
+    <ol class="breadcrumbs">
+      <li class="breadcrumbs-item">
+        <a href="{{help_center.url}}">{{help_center.name}}</a>
+      </li>
+      <li class="breadcrumbs-item">
+        <a href="{{help_center.url}}/requests">サポートリクエスト</a>
+      </li>
+      <li class="breadcrumbs-item">
+        新しいリクエスト
+      </li>
+    </ol>
+  </nav>
+
+  <header class="submit-request-header">
+    <div class="submit-request-title-section">
+      <h1 class="submit-request-title">サポートリクエストを送信</h1>
+      <p class="submit-request-description">
+        お困りのことがございましたら、詳細をお聞かせください。迅速にサポートいたします。
+      </p>
+    </div>
+  </header>
+
+  <main class="submit-request-main">
+    <form class="submit-request-form" method="post" action="{{help_center.url}}/requests" enctype="multipart/form-data">
+      <div class="form-section form-section--primary">
+        <div class="form-group">
+          <label for="request-requester-email" class="form-label required">メールアドレス</label>
+          <input type="email" id="request-requester-email" name="request[requester][email]" 
+                 class="form-input" placeholder="your@email.com" required
+                 value="{{current_user.email}}">
+          <div class="form-hint">
+            返信をお送りするメールアドレスです
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="request-requester-name" class="form-label required">お名前</label>
+          <input type="text" id="request-requester-name" name="request[requester][name]" 
+                 class="form-input" placeholder="山田 太郎" required
+                 value="{{current_user.name}}">
+        </div>
+
+        <div class="form-group">
+          <label for="request-subject" class="form-label required">件名</label>
+          <input type="text" id="request-subject" name="request[subject]" 
+                 class="form-input form-input--large" placeholder="問題の概要を簡潔に記入してください" required>
+          <div class="form-hint">
+            問題を具体的に表現する件名を入力してください
+          </div>
+        </div>
+
+        {{#if ticket_forms}}
+        <div class="form-group">
+          <label for="request-form" class="form-label">お問い合わせの種類</label>
+          <select id="request-form" name="request[ticket_form_id]" class="form-select">
+            <option value="">選択してください</option>
+            {{#each ticket_forms}}
+            <option value="{{id}}">{{name}}</option>
+            {{/each}}
+          </select>
+        </div>
+        {{/if}}
+
+        <div class="form-group">
+          <label for="request-description" class="form-label required">詳細説明</label>
+          <div class="editor-toolbar">
+            <div class="editor-format-buttons">
+              <button type="button" class="format-btn" data-format="bold" title="太字">
+                <strong>B</strong>
+              </button>
+              <button type="button" class="format-btn" data-format="italic" title="斜体">
+                <em>I</em>
+              </button>
+              <button type="button" class="format-btn" data-format="link" title="リンク">
+                🔗
+              </button>
+              <button type="button" class="format-btn" data-format="code" title="コード">
+                &lt;/&gt;
+              </button>
+              <button type="button" class="format-btn" data-format="list" title="リスト">
+                ≡
+              </button>
+            </div>
+          </div>
+          <textarea id="request-description" name="request[comment][body]" 
+                    class="form-textarea form-textarea--large" required rows="12"
+                    placeholder="問題の詳細、発生状況、試したことなどを具体的に記入してください"></textarea>
+          <div class="form-hint">
+            <strong>効果的なサポートのために以下の情報を含めてください：</strong>
+            <ul class="hint-list">
+              <li>問題が発生する具体的な手順</li>
+              <li>期待していた結果と実際の結果</li>
+              <li>エラーメッセージ（ある場合）</li>
+              <li>使用している環境（ブラウザ、OS等）</li>
+              <li>問題が発生した日時</li>
+            </ul>
+          </div>
+        </div>
+
+        {{#if priority_options}}
+        <div class="form-group">
+          <label for="request-priority" class="form-label">優先度</label>
+          <div class="priority-options">
+            {{#each priority_options}}
+            <label class="priority-option">
+              <input type="radio" name="request[priority]" value="{{value}}" class="priority-radio"
+                     {{#if default}}checked{{/if}}>
+              <div class="priority-card priority-card--{{value}}">
+                <div class="priority-icon">
+                  {{#is value 'urgent'}}🔴{{/is}}
+                  {{#is value 'high'}}🟠{{/is}}
+                  {{#is value 'normal'}}🟡{{/is}}
+                  {{#is value 'low'}}🟢{{/is}}
+                </div>
+                <div class="priority-info">
+                  <div class="priority-name">{{name}}</div>
+                  <div class="priority-description">
+                    {{#is value 'urgent'}}即座に対応が必要{{/is}}
+                    {{#is value 'high'}}24時間以内に対応{{/is}}
+                    {{#is value 'normal'}}通常の対応時間{{/is}}
+                    {{#is value 'low'}}時間に余裕がある{{/is}}
+                  </div>
+                </div>
+              </div>
+            </label>
+            {{/each}}
+          </div>
+        </div>
+        {{/if}}
+      </div>
+
+      {{#if custom_fields}}
+      <div class="form-section form-section--secondary">
+        <h3 class="form-section-title">追加情報</h3>
+        {{#each custom_fields}}
+        <div class="form-group">
+          <label for="custom-field-{{id}}" class="form-label {{#if required}}required{{/if}}">
+            {{title}}
+          </label>
+          
+          {{#is type 'text'}}
+          <input type="text" id="custom-field-{{id}}" name="request[custom_fields][{{id}}]" 
+                 class="form-input" {{#if required}}required{{/if}} 
+                 placeholder="{{description}}">
+          {{/is}}
+          
+          {{#is type 'textarea'}}
+          <textarea id="custom-field-{{id}}" name="request[custom_fields][{{id}}]" 
+                    class="form-textarea" rows="4" {{#if required}}required{{/if}}
+                    placeholder="{{description}}"></textarea>
+          {{/is}}
+          
+          {{#is type 'dropdown'}}
+          <select id="custom-field-{{id}}" name="request[custom_fields][{{id}}]" 
+                  class="form-select" {{#if required}}required{{/if}}>
+            <option value="">選択してください</option>
+            {{#each options}}
+            <option value="{{value}}">{{name}}</option>
+            {{/each}}
+          </select>
+          {{/is}}
+          
+          {{#is type 'checkbox'}}
+          <div class="checkbox-options">
+            {{#each options}}
+            <label class="checkbox-option">
+              <input type="checkbox" name="request[custom_fields][{{../id}}][]" 
+                     value="{{value}}" class="checkbox-input">
+              <span class="checkbox-label">{{name}}</span>
+            </label>
+            {{/each}}
+          </div>
+          {{/is}}
+          
+          {{#if description}}
+          <div class="field-description">{{description}}</div>
+          {{/if}}
+        </div>
+        {{/each}}
+      </div>
+      {{/if}}
+
+      <div class="form-section">
+        <div class="form-group">
+          <label for="request-attachments" class="form-label">添付ファイル</label>
+          <div class="file-upload-area">
+            <input type="file" id="request-attachments" name="request[comment][attachments][]" 
+                   class="file-input" multiple accept="image/*,.pdf,.doc,.docx,.txt,.zip,.log">
+            <label for="request-attachments" class="file-upload-label">
+              <span class="upload-icon">📎</span>
+              <span class="upload-text">ファイルを選択またはドラッグ&ドロップ</span>
+            </label>
+            <div class="file-list"></div>
+          </div>
+          <div class="file-upload-hint">
+            <strong>推奨ファイル:</strong> スクリーンショット、ログファイル、設定ファイル<br>
+            <strong>対応形式:</strong> 画像、PDF、Word文書、テキストファイル、ZIP（最大10MB）
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-group">
+          <div class="collaboration-request">
+            <label class="collaboration-checkbox">
+              <input type="checkbox" name="request[collaborator_ids][]" value="{{current_user.organization.id}}" 
+                     class="checkbox-input">
+              <span class="checkbox-label">組織内のメンバーがこのリクエストを閲覧・コメントできるようにする</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <div class="form-actions-main">
+          <button type="submit" class="btn btn-primary btn-large">リクエストを送信</button>
+          <button type="button" class="btn btn-secondary request-preview">プレビュー</button>
+        </div>
+        <div class="form-actions-secondary">
+          <a href="{{help_center.url}}" class="btn btn-link">キャンセル</a>
+          <button type="button" class="btn btn-link request-draft" data-action="save-draft">
+            下書き保存
+          </button>
+        </div>
+      </div>
+    </form>
+  </main>
+
+  <aside class="submit-request-sidebar">
+    <div class="request-tips">
+      <h3>効果的なリクエストのコツ</h3>
+      <div class="tips-content">
+        <div class="tip-item">
+          <div class="tip-icon">🎯</div>
+          <div class="tip-text">
+            <strong>具体的な件名</strong><br>
+            問題を一目で理解できる件名を付けてください
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-icon">📝</div>
+          <div class="tip-text">
+            <strong>詳細な説明</strong><br>
+            問題の発生手順を順を追って説明してください
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-icon">📷</div>
+          <div class="tip-text">
+            <strong>スクリーンショット</strong><br>
+            エラー画面や問題箇所のスクリーンショットを添付してください
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-icon">🔍</div>
+          <div class="tip-text">
+            <strong>検索してから送信</strong><br>
+            類似の問題がないかヘルプセンターで検索してみてください
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="support-info">
+      <h3>サポート対応時間</h3>
+      <div class="support-schedule">
+        <div class="schedule-item">
+          <div class="schedule-day">平日</div>
+          <div class="schedule-time">9:00 - 18:00</div>
+        </div>
+        <div class="schedule-item">
+          <div class="schedule-day">土日・祝日</div>
+          <div class="schedule-time">対応なし</div>
+        </div>
+      </div>
+      <div class="response-time">
+        <h4>目安回答時間</h4>
+        <ul class="response-list">
+          <li><span class="priority-urgent">緊急:</span> 2時間以内</li>
+          <li><span class="priority-high">高:</span> 24時間以内</li>
+          <li><span class="priority-normal">通常:</span> 2-3営業日</li>
+          <li><span class="priority-low">低:</span> 1週間以内</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="alternative-support">
+      <h3>その他のサポート方法</h3>
+      <div class="support-options">
+        {{#if help_center.phone}}
+        <div class="support-option">
+          <div class="support-icon">📞</div>
+          <div class="support-info">
+            <div class="support-method">電話サポート</div>
+            <div class="support-value">{{help_center.phone}}</div>
+            <div class="support-hours">平日 9:00-17:00</div>
+          </div>
+        </div>
+        {{/if}}
+
+        {{#if community.url}}
+        <div class="support-option">
+          <div class="support-icon">💬</div>
+          <div class="support-info">
+            <div class="support-method">コミュニティ</div>
+            <a href="{{community.url}}" class="support-link">質問を投稿</a>
+            <div class="support-description">他のユーザーと情報交換</div>
+          </div>
+        </div>
+        {{/if}}
+
+        {{#if help_center.chat_enabled}}
+        <div class="support-option">
+          <div class="support-icon">💭</div>
+          <div class="support-info">
+            <div class="support-method">チャットサポート</div>
+            <button class="support-link" onclick="startChat()">チャットを開始</button>
+            <div class="support-description">リアルタイムサポート</div>
+          </div>
+        </div>
+        {{/if}}
+      </div>
+    </div>
+
+    <div class="quick-solutions">
+      <h3>よくある解決策</h3>
+      <ul class="quick-solutions-list">
+        <li><a href="{{help_center.url}}/articles/password-reset">パスワードリセット</a></li>
+        <li><a href="{{help_center.url}}/articles/account-setup">アカウント設定</a></li>
+        <li><a href="{{help_center.url}}/articles/billing-issues">請求に関する問題</a></li>
+        <li><a href="{{help_center.url}}/articles/technical-issues">技術的な問題</a></li>
+      </ul>
+    </div>
+  </aside>
+</div>
+
+<!-- Preview Modal -->
+<div class="preview-modal" id="preview-modal" style="display: none;">
+  <div class="preview-modal-overlay" onclick="closePreview()"></div>
+  <div class="preview-modal-content">
+    <div class="preview-modal-header">
+      <h3 class="preview-modal-title">リクエストプレビュー</h3>
+      <button class="preview-modal-close" onclick="closePreview()">×</button>
+    </div>
+    <div class="preview-modal-body">
+      <div class="preview-content" id="preview-content"></div>
+    </div>
+    <div class="preview-modal-footer">
+      <button class="btn btn-primary" onclick="closePreview()">編集に戻る</button>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // File upload handling
+  const fileInput = document.getElementById('request-attachments');
+  const uploadArea = fileInput.closest('.file-upload-area');
+  const fileList = uploadArea.querySelector('.file-list');
+  
+  fileInput.addEventListener('change', function() {
+    displayFiles(this.files, fileList);
+  });
+  
+  // Drag and drop
+  uploadArea.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    this.classList.add('drag-over');
+  });
+  
+  uploadArea.addEventListener('dragleave', function(e) {
+    e.preventDefault();
+    this.classList.remove('drag-over');
+  });
+  
+  uploadArea.addEventListener('drop', function(e) {
+    e.preventDefault();
+    this.classList.remove('drag-over');
+    
+    const files = e.dataTransfer.files;
+    fileInput.files = files;
+    displayFiles(files, fileList);
+  });
+  
+  function displayFiles(files, container) {
+    container.innerHTML = '';
+    
+    Array.from(files).forEach((file, index) => {
+      const fileItem = document.createElement('div');
+      fileItem.className = 'file-item';
+      fileItem.innerHTML = `
+        <span class="file-name">${file.name}</span>
+        <span class="file-size">(${formatFileSize(file.size)})</span>
+        <button type="button" class="file-remove" data-index="${index}">×</button>
+      `;
+      
+      container.appendChild(fileItem);
+    });
+  }
+  
+  function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  }
+  
+  // Format buttons
+  const formatButtons = document.querySelectorAll('.format-btn');
+  const textarea = document.getElementById('request-description');
+  
+  formatButtons.forEach(button => {
+    button.addEventListener('click', function(e) {
+      e.preventDefault();
+      const format = this.dataset.format;
+      insertFormat(format, textarea);
+    });
+  });
+  
+  function insertFormat(format, textarea) {
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = textarea.value.substring(start, end);
+    let replacement = '';
+    
+    switch(format) {
+      case 'bold':
+        replacement = `**${selectedText || 'テキスト'}**`;
+        break;
+      case 'italic':
+        replacement = `*${selectedText || 'テキスト'}*`;
+        break;
+      case 'link':
+        replacement = `[${selectedText || 'リンクテキスト'}](URL)`;
+        break;
+      case 'code':
+        replacement = `\`${selectedText || 'コード'}\``;
+        break;
+      case 'list':
+        replacement = `- ${selectedText || 'リスト項目'}`;
+        break;
+    }
+    
+    textarea.value = textarea.value.substring(0, start) + replacement + textarea.value.substring(end);
+    textarea.focus();
+  }
+  
+  // Preview functionality
+  const previewBtn = document.querySelector('.request-preview');
+  if (previewBtn) {
+    previewBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      showPreview();
+    });
+  }
+  
+  function showPreview() {
+    const email = document.getElementById('request-requester-email').value;
+    const name = document.getElementById('request-requester-name').value;
+    const subject = document.getElementById('request-subject').value;
+    const description = document.getElementById('request-description').value;
+    const priority = document.querySelector('input[name="request[priority]"]:checked')?.nextElementSibling?.querySelector('.priority-name')?.textContent || '';
+    
+    const previewContent = document.getElementById('preview-content');
+    previewContent.innerHTML = `
+      <div class="preview-request">
+        <div class="preview-header">
+          <div class="preview-meta">
+            <div class="preview-sender">差出人: ${name || '名前なし'} &lt;${email || 'メールアドレスなし'}&gt;</div>
+            ${priority ? `<div class="preview-priority">優先度: ${priority}</div>` : ''}
+          </div>
+          <h2 class="preview-subject">${subject || '件名なし'}</h2>
+        </div>
+        <div class="preview-body">${markdownToHtml(description) || 'コンテンツなし'}</div>
+      </div>
+    `;
+    
+    document.getElementById('preview-modal').style.display = 'block';
+  }
+  
+  function markdownToHtml(markdown) {
+    return markdown
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/`(.*?)`/g, '<code>$1</code>')
+      .replace(/^- (.+)$/gm, '<li>$1</li>')
+      .replace(/\n/g, '<br>');
+  }
+  
+  window.closePreview = function() {
+    document.getElementById('preview-modal').style.display = 'none';
+  };
+  
+  // Draft functionality
+  const draftBtn = document.querySelector('.request-draft');
+  if (draftBtn) {
+    draftBtn.addEventListener('click', function() {
+      saveDraft();
+    });
+  }
+  
+  function saveDraft() {
+    const draftData = {
+      email: document.getElementById('request-requester-email').value,
+      name: document.getElementById('request-requester-name').value,
+      subject: document.getElementById('request-subject').value,
+      description: document.getElementById('request-description').value,
+      priority: document.querySelector('input[name="request[priority]"]:checked')?.value,
+      timestamp: new Date().toISOString()
+    };
+    
+    localStorage.setItem('support_request_draft', JSON.stringify(draftData));
+    
+    // Show feedback
+    draftBtn.textContent = '保存しました';
+    draftBtn.disabled = true;
+    setTimeout(() => {
+      draftBtn.textContent = '下書き保存';
+      draftBtn.disabled = false;
+    }, 2000);
+  }
+  
+  // Load draft on page load
+  const savedDraft = localStorage.getItem('support_request_draft');
+  if (savedDraft) {
+    const draftData = JSON.parse(savedDraft);
+    if (confirm('保存された下書きがあります。読み込みますか？')) {
+      document.getElementById('request-requester-email').value = draftData.email || '';
+      document.getElementById('request-requester-name').value = draftData.name || '';
+      document.getElementById('request-subject').value = draftData.subject || '';
+      document.getElementById('request-description').value = draftData.description || '';
+      if (draftData.priority) {
+        const priorityRadio = document.querySelector(`input[name="request[priority]"][value="${draftData.priority}"]`);
+        if (priorityRadio) priorityRadio.checked = true;
+      }
+    }
+  }
+  
+  // Form validation
+  const form = document.querySelector('.submit-request-form');
+  form.addEventListener('submit', function(e) {
+    const requiredFields = form.querySelectorAll('[required]');
+    let isValid = true;
+    
+    requiredFields.forEach(field => {
+      if (!field.value.trim()) {
+        isValid = false;
+        field.classList.add('error');
+      } else {
+        field.classList.remove('error');
+      }
+    });
+    
+    if (!isValid) {
+      e.preventDefault();
+      alert('必須項目をすべて入力してください。');
+      return;
+    }
+    
+    // Clear draft on successful submission
+    localStorage.removeItem('support_request_draft');
+  });
+  
+  // Auto-save draft every 60 seconds
+  setInterval(function() {
+    const subject = document.getElementById('request-subject').value.trim();
+    const description = document.getElementById('request-description').value.trim();
+    
+    if (subject || description) {
+      saveDraft();
+    }
+  }, 60000);
+  
+  // Chat functionality (if available)
+  window.startChat = function() {
+    // Integration with chat widget would go here
+    if (window.zE) {
+      window.zE('webWidget', 'open');
+    } else {
+      alert('チャット機能は現在利用できません。');
+    }
+  };
+});
+</script>
