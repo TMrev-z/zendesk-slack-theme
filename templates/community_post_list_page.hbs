@@ -1,0 +1,209 @@
+<div class="community-container">
+  <nav class="community-breadcrumbs">
+    <ol class="breadcrumbs">
+      <li class="breadcrumbs-item">
+        <a href="{{help_center.url}}">{{help_center.name}}</a>
+      </li>
+      <li class="breadcrumbs-item">
+        <a href="{{community.url}}">コミュニティ</a>
+      </li>
+      {{#if topic}}
+      <li class="breadcrumbs-item">
+        <a href="{{topic.url}}">{{topic.name}}</a>
+      </li>
+      {{/if}}
+    </ol>
+  </nav>
+
+  <header class="community-header">
+    <div class="community-header-content">
+      {{#if topic}}
+      <h1 class="community-title">{{topic.name}}</h1>
+      {{#if topic.description}}
+      <div class="community-description">
+        <p>{{topic.description}}</p>
+      </div>
+      {{/if}}
+      {{else}}
+      <h1 class="community-title">コミュニティディスカッション</h1>
+      <div class="community-description">
+        <p>他のユーザーと情報を共有し、質問やアイデアを議論しましょう。</p>
+      </div>
+      {{/if}}
+    </div>
+    
+    <div class="community-actions">
+      {{#if current_user}}
+      <a href="{{community.url}}/posts/new{{#if topic}}?topic_id={{topic.id}}{{/if}}" class="btn btn-primary community-new-post">
+        新しい投稿
+      </a>
+      {{else}}
+      <a href="{{help_center.signin_url}}" class="btn btn-secondary">
+        サインインして投稿
+      </a>
+      {{/if}}
+    </div>
+  </header>
+
+  <main class="community-main">
+    {{#if posts}}
+    <div class="community-posts">
+      <div class="posts-header">
+        <div class="posts-count">
+          {{posts.length}} 件の投稿
+        </div>
+        
+        <div class="posts-sorting">
+          <label for="sort-select">並び替え:</label>
+          <select id="sort-select" class="posts-sort-select">
+            <option value="recent">最新順</option>
+            <option value="popular">人気順</option>
+            <option value="answered">回答済み</option>
+          </select>
+        </div>
+      </div>
+
+      <ul class="posts-list">
+        {{#each posts}}
+        <li class="post-item">
+          <article class="community-post">
+            <div class="post-stats">
+              <div class="post-vote-count">
+                <span class="vote-count">{{vote_sum}}</span>
+                <span class="vote-label">投票</span>
+              </div>
+              
+              <div class="post-comment-count">
+                <span class="comment-count">{{comment_count}}</span>
+                <span class="comment-label">コメント</span>
+              </div>
+            </div>
+
+            <div class="post-content">
+              <h3 class="post-title">
+                <a href="{{url}}" class="post-link">{{title}}</a>
+              </h3>
+              
+              {{#if details}}
+              <div class="post-excerpt">
+                <p>{{excerpt details characters=200}}</p>
+              </div>
+              {{/if}}
+              
+              <div class="post-meta">
+                <div class="post-author">
+                  {{#if author.avatar_url}}
+                  <img src="{{author.avatar_url}}" alt="{{author.name}}" class="post-author-avatar" loading="lazy">
+                  {{/if}}
+                  <span class="post-author-name">{{author.name}}</span>
+                </div>
+                
+                <div class="post-dates">
+                  <time class="post-created" datetime="{{created_at}}">
+                    {{date created_at timeago=true}}
+                  </time>
+                  
+                  {{#if edited_at}}
+                  <time class="post-edited" datetime="{{edited_at}}">
+                    編集: {{date edited_at timeago=true}}
+                  </time>
+                  {{/if}}
+                </div>
+                
+                {{#if status}}
+                <div class="post-status post-status--{{status}}">
+                  {{#is status 'solved'}}
+                    <span class="post-status-icon">✅</span>
+                    <span class="post-status-text">解決済み</span>
+                  {{/is}}
+                  {{#is status 'answered'}}
+                    <span class="post-status-icon">💬</span>
+                    <span class="post-status-text">回答済み</span>
+                  {{/is}}
+                  {{#is status 'open'}}
+                    <span class="post-status-icon">🔓</span>
+                    <span class="post-status-text">議論中</span>
+                  {{/is}}
+                </div>
+                {{/if}}
+              </div>
+
+              {{#if labels}}
+              <div class="post-labels">
+                {{#each labels}}
+                <span class="post-label">{{name}}</span>
+                {{/each}}
+              </div>
+              {{/if}}
+            </div>
+          </article>
+        </li>
+        {{/each}}
+      </ul>
+      
+      <!-- Pagination -->
+      {{pagination}}
+    </div>
+    
+    {{else}}
+    <div class="community-empty">
+      <div class="empty-state">
+        <div class="empty-state-icon">💬</div>
+        <h2 class="empty-state-title">投稿がまだありません</h2>
+        <div class="empty-state-description">
+          {{#if topic}}
+          <p>「{{topic.name}}」にはまだ投稿がありません。最初の投稿をしてディスカッションを始めましょう。</p>
+          {{else}}
+          <p>コミュニティにはまだ投稿がありません。最初の投稿をしてディスカッションを始めましょう。</p>
+          {{/if}}
+        </div>
+        
+        <div class="empty-state-actions">
+          {{#if current_user}}
+          <a href="{{community.url}}/posts/new{{#if topic}}?topic_id={{topic.id}}{{/if}}" class="btn btn-primary">
+            最初の投稿をする
+          </a>
+          {{else}}
+          <a href="{{help_center.signin_url}}" class="btn btn-secondary">
+            サインインして投稿
+          </a>
+          {{/if}}
+          <a href="{{help_center.url}}" class="btn btn-secondary">
+            ヘルプセンターに戻る
+          </a>
+        </div>
+      </div>
+    </div>
+    {{/if}}
+  </main>
+
+  <aside class="community-sidebar">
+    {{#if community.topics}}
+    <div class="community-topics">
+      <h3>トピック</h3>
+      <ul class="topics-list">
+        {{#each community.topics}}
+        <li class="topic-item">
+          <a href="{{url}}" class="topic-link {{#if selected}}topic-link--active{{/if}}">
+            {{name}}
+            {{#if post_count}}
+            <span class="topic-post-count">({{post_count}})</span>
+            {{/if}}
+          </a>
+        </li>
+        {{/each}}
+      </ul>
+    </div>
+    {{/if}}
+
+    <div class="community-guidelines">
+      <h3>コミュニティガイドライン</h3>
+      <ul class="guidelines-list">
+        <li>他のユーザーを尊重しましょう</li>
+        <li>建設的な議論を心がけましょう</li>
+        <li>関連する情報を共有しましょう</li>
+        <li>スパムや無関係な投稿は避けましょう</li>
+      </ul>
+    </div>
+  </aside>
+</div>
