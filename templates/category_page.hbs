@@ -1,0 +1,51 @@
+{{#with category}}
+<div class="category-container">
+  <nav class="category-breadcrumbs">
+    <ol class="breadcrumbs">
+      <li class="breadcrumbs-item">
+        <a href="{{help_center.url}}">{{help_center.name}}</a>
+      </li>
+    </ol>
+  </nav>
+
+  <header class="category-header">
+    <h1 class="category-title">{{name}}</h1>
+    {{#if description}}
+    <div class="category-description">
+      <p>{{description}}</p>
+    </div>
+    {{/if}}
+  </header>
+
+  <main class="category-main">
+    {{#if sections}}
+    <div class="category-sections">
+      <ul class="sections-list">
+        {{#each sections}}
+        <li class="section-item">
+          <div class="hc-card">
+            <a href="{{url}}" class="hc-card__link">
+              <div class="hc-card__icon">
+                <img src="{{asset 'icons/default.svg'}}" alt="" loading="lazy" />
+              </div>
+              <h3 class="hc-card__title">{{name}}</h3>
+              {{#if description}}
+              <p class="hc-card__desc">{{description}}</p>
+              {{/if}}
+              <div class="section-meta">
+                <span class="section-article-count">{{articles.length}} 記事</span>
+              </div>
+            </a>
+          </div>
+        </li>
+        {{/each}}
+      </ul>
+    </div>
+    {{else}}
+    <div class="category-empty">
+      <p>このカテゴリにはまだセクションがありません。</p>
+    </div>
+    {{/if}}
+  </main>
+</div>
+{{/with}}

@@ -1,0 +1,65 @@
+{{#with section}}
+<div class="section-container">
+  <nav class="section-breadcrumbs">
+    <ol class="breadcrumbs">
+      <li class="breadcrumbs-item">
+        <a href="{{help_center.url}}">{{help_center.name}}</a>
+      </li>
+      <li class="breadcrumbs-item">
+        <a href="{{category.url}}">{{category.name}}</a>
+      </li>
+    </ol>
+  </nav>
+
+  <header class="section-header">
+    <h1 class="section-title">{{name}}</h1>
+    {{#if description}}
+    <div class="section-description">
+      <p>{{description}}</p>
+    </div>
+    {{/if}}
+  </header>
+
+  <main class="section-main">
+    {{#if articles}}
+    <div class="section-articles">
+      <ul class="articles-list">
+        {{#each articles}}
+        <li class="article-item">
+          <article class="article-preview">
+            <h3 class="article-preview-title">
+              <a href="{{url}}" class="article-preview-link">{{title}}</a>
+            </h3>
+            {{#if body}}
+            <div class="article-preview-body">
+              <p>{{excerpt body characters=150}}</p>
+            </div>
+            {{/if}}
+            <div class="article-preview-meta">
+              {{#if author}}
+              <span class="article-preview-author">{{author.name}}</span>
+              {{/if}}
+              <time class="article-preview-date" datetime="{{created_at}}">
+                {{date created_at}}
+              </time>
+              {{#if labels}}
+              <div class="article-preview-labels">
+                {{#each labels}}
+                <span class="article-label">{{name}}</span>
+                {{/each}}
+              </div>
+              {{/if}}
+            </div>
+          </article>
+        </li>
+        {{/each}}
+      </ul>
+    </div>
+    {{else}}
+    <div class="section-empty">
+      <p>このセクションにはまだ記事がありません。</p>
+    </div>
+    {{/if}}
+  </main>
+</div>
+{{/with}}

@@ -1,0 +1,124 @@
+{{#with article}}
+<div class="article-container">
+  <nav class="article-breadcrumbs">
+    <ol class="breadcrumbs">
+      <li class="breadcrumbs-item">
+        <a href="{{help_center.url}}">{{help_center.name}}</a>
+      </li>
+      <li class="breadcrumbs-item">
+        <a href="{{section.category.url}}">{{section.category.name}}</a>
+      </li>
+      <li class="breadcrumbs-item">
+        <a href="{{section.url}}">{{section.name}}</a>
+      </li>
+    </ol>
+  </nav>
+
+  <main class="article-main">
+    <header class="article-header">
+      <h1 class="article-title">{{title}}</h1>
+      
+      <div class="article-meta">
+        <div class="article-author">
+          {{#if author}}
+          <span class="article-author-avatar">
+            <img src="{{author.avatar_url}}" alt="{{author.name}}" loading="lazy">
+          </span>
+          <span class="article-author-name">{{author.name}}</span>
+          {{/if}}
+        </div>
+        
+        <div class="article-dates">
+          <time class="article-created" datetime="{{created_at}}">
+            {{date created_at timeago=true}}
+          </time>
+          {{#if edited_at}}
+          <time class="article-edited" datetime="{{edited_at}}">
+            更新: {{date edited_at timeago=true}}
+          </time>
+          {{/if}}
+        </div>
+      </div>
+
+      {{#if labels}}
+      <div class="article-labels">
+        {{#each labels}}
+        <span class="article-label">{{name}}</span>
+        {{/each}}
+      </div>
+      {{/if}}
+    </header>
+
+    <div class="article-body">
+      {{{body}}}
+    </div>
+
+    <footer class="article-footer">
+      {{#if attachments}}
+      <div class="article-attachments">
+        <h3>添付ファイル</h3>
+        <ul class="attachments-list">
+          {{#each attachments}}
+          <li class="attachment-item">
+            <a href="{{url}}" target="_blank" rel="noopener noreferrer">
+              <span class="attachment-icon">📎</span>
+              <span class="attachment-name">{{file_name}}</span>
+              <span class="attachment-size">({{size}})</span>
+            </a>
+          </li>
+          {{/each}}
+        </ul>
+      </div>
+      {{/if}}
+
+      <div class="article-voting">
+        <span class="article-voting-question">この記事は役に立ちましたか？</span>
+        <div class="article-voting-buttons">
+          {{vote 'up' role='button' class='article-vote article-vote-up'}}
+          {{vote 'down' role='button' class='article-vote article-vote-down'}}
+        </div>
+        <small class="article-voting-count">
+          {{vote 'label' class='article-voting-label'}}
+        </small>
+      </div>
+
+      <div class="article-more-questions">
+        <p>他にご質問がございましたら、<a href="{{help_center.url}}/requests/new">リクエストを送信</a>してください。</p>
+      </div>
+    </footer>
+  </main>
+
+  <aside class="article-sidebar">
+    <div class="article-relatives">
+      {{#if section.articles}}
+      <div class="related-articles">
+        <h3>関連記事</h3>
+        <ul class="related-articles-list">
+          {{#each section.articles}}
+          {{#unless selected}}
+          <li class="related-article-item">
+            <a href="{{url}}" class="related-article-link">{{title}}</a>
+          </li>
+          {{/unless}}
+          {{/each}}
+        </ul>
+      </div>
+      {{/if}}
+    </div>
+
+    <div class="article-return">
+      <a href="{{section.url}}" class="btn btn-secondary">
+        ← {{section.name}} に戻る
+      </a>
+    </div>
+  </aside>
+</div>
+
+<!-- Recently viewed articles -->
+<section class="recent-articles">
+  <div class="hc-container">
+    <h2>最近閲覧した記事</h2>
+    {{recent_activity}}
+  </div>
+</section>
+{{/with}}

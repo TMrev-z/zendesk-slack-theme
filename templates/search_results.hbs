@@ -1,0 +1,86 @@
+<div class="search-results-container">
+  <header class="search-results-header">
+    <h1 class="search-results-title">検索結果</h1>
+    {{#if query}}
+    <p class="search-results-query">
+      「<strong>{{query}}</strong>」の検索結果 {{#if results}}({{results.length}} 件){{/if}}
+    </p>
+    {{/if}}
+  </header>
+
+  <main class="search-results-main">
+    {{#if results}}
+    <div class="search-results-list">
+      {{#each results}}
+      <article class="search-result-item">
+        <h3 class="search-result-title">
+          <a href="{{url}}" class="search-result-link">{{title}}</a>
+        </h3>
+        
+        {{#if body}}
+        <div class="search-result-snippet">
+          <p>{{{snippet}}}</p>
+        </div>
+        {{/if}}
+        
+        <div class="search-result-meta">
+          <div class="search-result-breadcrumbs">
+            {{#if section}}
+            <a href="{{section.category.url}}" class="search-result-category">{{section.category.name}}</a>
+            <span class="search-result-separator">›</span>
+            <a href="{{section.url}}" class="search-result-section">{{section.name}}</a>
+            {{/if}}
+          </div>
+          
+          {{#if created_at}}
+          <time class="search-result-date" datetime="{{created_at}}">
+            {{date created_at}}
+          </time>
+          {{/if}}
+          
+          {{#if labels}}
+          <div class="search-result-labels">
+            {{#each labels}}
+            <span class="article-label">{{name}}</span>
+            {{/each}}
+          </div>
+          {{/if}}
+        </div>
+      </article>
+      {{/each}}
+    </div>
+
+    <!-- Pagination -->
+    {{pagination}}
+
+    {{else}}
+    <div class="search-results-empty">
+      <div class="empty-state">
+        <div class="empty-state-icon">🔍</div>
+        <h2 class="empty-state-title">検索結果が見つかりませんでした</h2>
+        <p class="empty-state-description">
+          {{#if query}}
+          「{{query}}」に一致する記事が見つかりませんでした。
+          {{else}}
+          検索キーワードを入力してください。
+          {{/if}}
+        </p>
+        
+        <div class="empty-state-suggestions">
+          <h3>検索のヒント：</h3>
+          <ul>
+            <li>キーワードのスペルを確認してください</li>
+            <li>別のキーワードを試してください</li>
+            <li>より一般的な用語を使用してください</li>
+          </ul>
+        </div>
+        
+        <div class="empty-state-actions">
+          <a href="{{help_center.url}}" class="btn btn-primary">ヘルプセンターに戻る</a>
+          <a href="{{help_center.url}}/requests/new" class="btn btn-secondary">サポートに問い合わせ</a>
+        </div>
+      </div>
+    </div>
+    {{/if}}
+  </main>
+</div>
